@@ -3,6 +3,16 @@ extends layout
 block content
     div(id='timelineCont').Hidden
         div(id='timeline')
+    div.modal.fade.video-modal(tabindex='-1', role='dialog', aria-labelledby='videoModal' aria-hidden='true')
+        div.modal-dialog.modal-lg
+            div.modal-content
+                div.modal-header
+                    button(type='button', data-dismiss='modal', aria-label='Close').close
+                        span(aria-hidden='true')&times;
+                    h4.modal-title Title
+                div.modal-body
+                    video.videoContent(controls='true', width='100%', title='', autoplay)
+                        source(src='', type='video/mp4')
     script.
         $(document).on('DOMContentLoaded', function() {
             var self = this,
@@ -22,7 +32,7 @@ block content
                 $('head').append('<link rel="stylesheet" type="text/css" href="../../css/timeline.css">');
                 self.setFlags(true);
                 $('#timelineCont').removeClass('Hidden');
-                $('.slider-item').on('DOMSubtreeModified', self.removeH3);
+                $('.slider-item').on('DOMSubtreeModified', self.update);
             },  1000);
 
             $('#timeline').click(function(e) {
@@ -31,9 +41,21 @@ block content
                 }
             });
 
-            this.removeH3 = function() {
+            this.update = function() {
                 $('.vco-storyjs .vco-feature h3').remove();
+                $('.videoTrigger').off();
+                $('.videoTrigger').click(function(e) {
+                    $('.modal-title').html($(e.currentTarget).attr('video-type'));
+                    $('.videoContent source').attr('src', '../../videos/' + $(e.currentTarget).attr('video-src') + $(e.currentTarget).attr('video-period'));
+                    $('.videoContent').load();
+                    $('.videoContent').removeClass('Hidden');
+                });
             }
+
+            $('.modal').on('hidden.bs.modal', function(e) {
+                $('.videoContent').get(0).pause();
+                $('.videoContent').addClass('Hidden');
+            });
 
             this.setFlags = function(init) {
                 var flags = $('.flag'),

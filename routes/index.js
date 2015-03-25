@@ -139,7 +139,7 @@ router.get('/timelinedata/:event/:date', function(req, res) {
                 }
                 timeline.date[index].text += "</div></div>";
             }
-            timeline.date[index].text += "<div class='col-md-2 rel'><div class='row'><div class='col-md-12'><h4>" + data[i].type + "</h4></div><div class='col-md-12'><img class='videoTrigger' src='../../images/" + data[i].screencap_id + "'></div>";
+            timeline.date[index].text += "<div class='col-md-2 rel'><div class='row'><div class='col-md-12'><h4>" + data[i].type + "</h4></div><div class='col-md-12'><img class='videoTrigger' data-toggle='modal' data-target='.video-modal' video-type='" + data[i].type + "' video-src='" + data[i].video_id + "' video-period='#t=" + data[i].video_start + "," + data[i].video_end + "' src='../../images/" + data[i].screencap_id + "'></div>";
             tags = [];
             for (j = 0; j < countries.length; j++) {
                 tag = { country: countries[j] };

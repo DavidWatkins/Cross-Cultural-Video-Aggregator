@@ -41,3 +41,11 @@ a {
 	text-align: center;
 	margin-top: 208px;
 }
+
+.video-player {
+	width: 80%;
+}
+
+body .modal-lg {
+    width: 60%; /* respsonsive width */
+}
