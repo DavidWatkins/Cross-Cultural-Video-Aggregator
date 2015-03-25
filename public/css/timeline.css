@@ -1,0 +1,80 @@
+.vco-timeline .vco-navigation {
+	height: 180px;
+}
+
+.vco-timeline .vco-navigation .timenav .time {
+	top: 180px;
+}
+
+.vco-timeline .vco-navigation .timenav-background .timenav-line {
+	height: 180px;
+}
+
+.vco-timeline .vco-navigation .timenav-background .timenav-indicator {
+	background-image: none;
+}
+
+.vco-timeline .vco-navigation .timenav-background .timenav-interval-background {
+	top: 181px;
+}
+
+.vco-timeline .vco-navigation .timenav-background .timenav-tag-size-full {
+	height: 60px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .dot {
+	top: 180px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .line {
+	height: 180px;
+}
+
+.vco-timeline .vco-navigation .timenav-background {
+	height: 180px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .flag {
+	background-image: none;
+	height: 80px;
+	width: 120px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .flag .flag-content {
+	height: 78px;
+}
+
+.vco-storyjs .thumbnail {
+	height: 80px;
+	width: 120px;
+	margin-top: 0px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .flag .flag-content .thumbnail img, .vco-timeline .vco-navigation .timenav .content .marker .flag-small .flag-content .thumbnail img {
+	height: 78px;
+	width: 118px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker.active .flag {
+	background-image: none;
+	height: 80px;
+	width: 120px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker.active .flag .flag-content {
+	height: 78px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .flag:hover {
+	background-image: none;
+	height: 80px;
+	width: 120px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .flag .flag-content:hover {
+	height: 78px;
+}
+
+.vco-timeline .vco-navigation .timenav .content .marker .flag .flag-content, .vco-timeline .vco-navigation .timenav .content .marker .flag-small .flag-content {
+	padding: 0px;
+}

@@ -1,0 +1,20 @@
+extends layout
+
+block content
+    h1.title AirAsia, 12/29/2014
+    - var count = 0;
+    .row
+        - each rel in data
+            .col-md-3.rel
+                .row
+                    .col-md-12
+                        h3 #{rel.type} (#{rel.countries})
+                    .col-md-12
+                        video.videoContent(controls='true' width='100%' title='video' + rel.video_id)
+                            source(src='videos/' + rel.video_id + '#t=' + rel.video_start + ',' + rel.video_end type='video/mp4')
+                    - each tag in rel.tags
+                        .col-md-12
+                            h3.= tag.tags
+            - count++;
+            if count % 4 == 0
+                .clearfix

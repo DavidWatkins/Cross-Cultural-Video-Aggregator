@@ -1,0 +1,43 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.rel {
+	text-align: center;
+	margin-right: 50px;
+}
+
+.rel .row .col-md-12:nth-child(3) {
+	border-bottom: 1px solid #939393;
+}
+
+.title {
+	margin-bottom: 50px;
+	font-style: italic;
+}
+
+.col-md-12 {
+	margin-bottom: 10px;
+}
+
+.Hidden {
+	visibility: hidden;
+}
+
+.videoTrigger {
+	cursor: pointer;
+}
+
+.tags {
+	margin-top: 10px;
+}
+
+.labels {
+	text-align: center;
+	margin-top: 208px;
+}

@@ -1,0 +1,60 @@
+extends layout
+
+block content
+    div(id='timelineCont').Hidden
+        div(id='timeline')
+    script.
+        $(document).on('DOMContentLoaded', function() {
+            var self = this,
+                flags;
+
+            createStoryJS({
+                type:       'timeline',
+                width:      '100%',
+                height:     '800',
+                source:     '../../timelinedata/#{event}/#{date}',
+                embed_id:   'timeline',
+                start_zoom_adjust: '2'
+            });
+
+            setTimeout(function() {
+                $('.vco-container').prepend($('.vco-navigation'));
+                $('head').append('<link rel="stylesheet" type="text/css" href="../../css/timeline.css">');
+                self.setFlags(true);
+                $('#timelineCont').removeClass('Hidden');
+                $('.slider-item').on('DOMSubtreeModified', self.removeH3);
+            },  1000);
+
+            $('#timeline').click(function(e) {
+                if($(e.target).parent().hasClass('vco-toolbar') || $(e.target).parent().hasClass('zoom-out') || $(e.target).parent().hasClass('zoom-in')) {
+                    self.setFlags(false);
+                }
+            });
+
+            this.removeH3 = function() {
+                $('.vco-storyjs .vco-feature h3').remove();
+            }
+
+            this.setFlags = function(init) {
+                var flags = $('.flag'),
+                    top;
+                for (i = 0; i < flags.length; i++) {
+                    top = $(flags[i]).css('top');
+                    if (top == '50px' || top == '25px') {
+                        $(flags[i]).css('top', '25px');
+                        if (init) {
+                            $(flags[i]).css('height', '120px');
+                            $(flags[i]).css('width', '190px')
+                            $(flags[i]).children().css('height', '118px');
+                            $(flags[i]).children().children().css('height', '120px');
+                            $(flags[i]).children().children().css('width', '190px');
+                            $(flags[i]).children().children().children().css('height', '120px');
+                            $(flags[i]).children().children().children().css('width', '190px');
+                        }
+                    } else if (top == '100px') {
+                        $(flags[i]).css('top', '100px');
+                    }
+                }
+            }
+
+        });

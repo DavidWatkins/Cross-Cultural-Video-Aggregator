@@ -1,0 +1,38 @@
+extends layout
+
+block content
+    h1.title Add rel
+    form(action='/managerels/new', method='post', role='form', style='width: 50%', enctype='multipart/form-data')
+        textarea.form-control(name='rel', rows='10', placeholder="json object string for rel")
+        button.btn.btn-primary(type='submit') Upload
+    hr
+    hr    
+    h1.title Manage rels
+    table.table.table-striped
+        tr
+            th Event
+            th Date
+            th Type
+            th Countries
+            th Tags
+            th video_id
+            th video_start
+            th video_end
+            th screencap_id
+            th
+            th
+        - each rel in data
+            tr
+                td #{rel.event}
+                td #{rel.date}
+                td #{rel.type}
+                td #{rel.countries}
+                td #{rel.tags}
+                td #{rel.video_id}
+                td #{rel.video_start}
+                td #{rel.video_end}
+                td #{rel.screencap_id}
+                td
+                    a(href='#') Edit
+                td
+                    a(href='managerels/del/#{rel._id}') Delete

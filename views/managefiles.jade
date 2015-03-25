@@ -1,0 +1,33 @@
+extends layout
+
+block content
+    h1.title Upload file
+    form.form-inline(action='/managefiles/new', method='post', role='form', enctype='multipart/form-data')
+        .form-group
+            label(for='inputFile') File input
+            input(type='file', name='inputFile', id='inputFile')
+            p Choose an mp4 or jpg file.
+        .form-group
+            label(for='name') Name
+            input.form-control(type='text', name='name', id='name')
+        button.btn.btn-primary(type='submit') Upload
+    hr
+    hr    
+    h1.title Manage files
+    table.table.table-striped
+        tr
+            th File ID
+            th File name
+            th
+            th
+            th
+        - each file in data
+            tr
+                td #{file._id}
+                td #{file.filename}
+                td 
+                    a(href='images/#{file._id}') View
+                td
+                    a(href='#') Edit
+                td
+                    a(href='#') Delete
