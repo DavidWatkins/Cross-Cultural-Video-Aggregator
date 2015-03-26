@@ -109,16 +109,18 @@ router.get('/timelinedata/:event/:date', function(req, res) {
                 dateCounts.push([0,0,0]);
                 timeline.date.push(timelinedate);
                 index = dates.indexOf(data[i].date);
-                // tracking which countries
-                if (countries.indexOf(timelinedate.tag) == -1 && timelinedate.tag != 'Shared') {
-                    countries.push(timelinedate.tag);
-                }
             } else {
                 // if the previous one was not common, override some attributes
                 if (data[i].countries.length != 1 && timeline.date[index].tag != "Shared") {
                     timeline.date[index].tag = "Shared";
                     timeline.date[index].asset.thumbnail = "../../images/" + data[i].screencap_id;
                     timeline.date[index].headline = "<img src='../../images/" + data[i].screencap_id + "'>";
+                }
+            }
+            for (j = 0; j < data[i].countries.length; j++) {
+                // tracking which countries
+                if (countries.indexOf(data[i].countries[j]) == -1) {
+                    countries.push(data[i].countries[j]);
                 }
             }
             if (data[i].type == 'common') {
@@ -171,12 +173,31 @@ router.get('/timelinedata/:event/:date', function(req, res) {
     });
 });
 
-// 
 router.get('/timeline/:event/:date', function(req, res) {
-    res.render('timeline', {
-        title: 'Timeline', 
-        event: req.params.event,
-        date: req.params.date
+    var datereq = req.params.date.replace('-', '/').replace('-', '/'),
+        slide = 0,
+        dates = [];
+    db.collection('rels').find({event: req.params.event}).sort({ date: 1 }).toArray(function(err, data) {
+        // figure out what slide to start on
+        for (i = 0; i < data.length; i++) {
+            if (dates.indexOf(data[i].date) == -1) {
+                if (datereq == data[i].date) {
+                    slide = i + 1;
+                    break;
+                }
+                dates.push(data[i].date);
+            }
+        }
+        if (slide == 0) {
+            console.log('no matching date');
+            console.log(dates, datereq);
+        }
+        res.render('timeline', {
+            title: 'Timeline', 
+            event: req.params.event,
+            date: req.params.date,
+            slide: slide
+        });
     });
 });
 

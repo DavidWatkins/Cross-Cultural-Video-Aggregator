@@ -8,7 +8,7 @@ block content
             div.modal-content
                 div.modal-header
                     button(type='button', data-dismiss='modal', aria-label='Close').close
-                        span(aria-hidden='true')&times;
+                        span(aria-hidden='true') &times;
                     h4.modal-title Title
                 div.modal-body
                     video.videoContent(controls='true', width='100%', title='', autoplay)
@@ -24,7 +24,8 @@ block content
                 height:     '800',
                 source:     '../../timelinedata/#{event}/#{date}',
                 embed_id:   'timeline',
-                start_zoom_adjust: '2'
+                start_zoom_adjust: '2',
+                start_at_slide: '#{slide}'
             });
 
             setTimeout(function() {
