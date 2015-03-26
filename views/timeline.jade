@@ -1,6 +1,11 @@
 extends layout
 
 block content
+    div(id='slideoptions').Hidden
+        ul
+            li.active.starttab Video Differences
+            li Clip Info
+            li Others
     div(id='timelineCont').Hidden
         div(id='timeline')
     div.modal.fade.video-modal(tabindex='-1', role='dialog', aria-labelledby='videoModal' aria-hidden='true')
@@ -29,9 +34,11 @@ block content
             });
 
             setTimeout(function() {
+                $('.vco-container').prepend($('#slideoptions'));
                 $('.vco-container').prepend($('.vco-navigation'));
                 $('head').append('<link rel="stylesheet" type="text/css" href="../../css/timeline.css">');
                 self.setFlags(true);
+                $('#slideoptions').removeClass('Hidden');
                 $('#timelineCont').removeClass('Hidden');
                 $('.slider-item').on('DOMSubtreeModified', self.update);
             },  1000);
@@ -77,6 +84,28 @@ block content
                     } else if (top == '100px') {
                         $(flags[i]).css('top', '100px');
                     }
+                }
+            }
+
+            // handle the options bar navigation
+            $('#slideoptions ul li').click(function(e) {
+                var prevActive = self.getTabName($('#slideoptions ul li.active').html()),
+                    newActive =  self.getTabName($(e.currentTarget).html());
+                if (prevActive != newActive) {
+                    $('#slideoptions ul li.active').removeClass('active');
+                    $(e.currentTarget).addClass('active');
+                     $('.row.' + prevActive).addClass('NoDisplay');
+                     $('.row.' + newActive).removeClass('NoDisplay');
+                }    
+            });
+
+            this.getTabName = function(name) {
+                if (name == 'Video Differences') {
+                    return 'videoDifferences';
+                } else if (name == 'Clip Info') {
+                    return 'clipInfo';
+                } else {
+                    return 'others';
                 }
             }
 

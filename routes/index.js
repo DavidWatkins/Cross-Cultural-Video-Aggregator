@@ -93,7 +93,7 @@ router.get('/timelinedata/:event/:date', function(req, res) {
                     startDate: data[i].date,
                     endDate: data[i].date,
                     headline: "<img src='../../images/" + data[i].screencap_id + "'>",
-                    text: "<div class='row'>",
+                    text: "<div class='row clipInfo NoDisplay'>Clip Info</div><div class='row others NoDisplay'>Others</div><div class='row videoDifferences'>",
                     tag: "",
                     classname: data[i].date,
                     asset: {

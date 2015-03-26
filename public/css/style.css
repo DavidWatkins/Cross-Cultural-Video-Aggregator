@@ -49,3 +49,28 @@ a {
 body .modal-lg {
     width: 60%; /* respsonsive width */
 }
+
+#slideoptions {
+	width: 100%;
+	background-color: black;
+	margin-top: 50px;
+	padding: 15px 40px 20px 110px;
+}
+
+#slideoptions ul li {
+	cursor: pointer;
+    font-family: Arial;
+    font-size: 15px;
+    font-weight: bold;
+	display: inline;
+	margin: 0px 0px 0px 100px;
+	color: #696969;
+}
+
+#slideoptions ul li.active {
+	color: #d3d3d3;
+}
+
+.NoDisplay {
+	display: none;
+}
