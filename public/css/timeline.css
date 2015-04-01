@@ -1,13 +1,13 @@
 .vco-timeline .vco-navigation {
-	height: 180px;
+	height: 150px;
 }
 
 .vco-timeline .vco-navigation .timenav .time {
-	top: 180px;
+	top: 150px;
 }
 
 .vco-timeline .vco-navigation .timenav-background .timenav-line {
-	height: 180px;
+	height: 150px;
 }
 
 .vco-timeline .vco-navigation .timenav-background .timenav-indicator {
@@ -15,23 +15,23 @@
 }
 
 .vco-timeline .vco-navigation .timenav-background .timenav-interval-background {
-	top: 181px;
+	top: 151px;
 }
 
 .vco-timeline .vco-navigation .timenav-background .timenav-tag-size-full {
-	height: 60px;
+	height: 50px;
 }
 
 .vco-timeline .vco-navigation .timenav .content .marker .dot {
-	top: 180px;
+	top: 150px;
 }
 
 .vco-timeline .vco-navigation .timenav .content .marker .line {
-	height: 180px;
+	height: 150px;
 }
 
 .vco-timeline .vco-navigation .timenav-background {
-	height: 180px;
+	height: 150px;
 }
 
 .vco-timeline .vco-navigation .timenav .content .marker .flag {
@@ -78,3 +78,4 @@
 .vco-timeline .vco-navigation .timenav .content .marker .flag .flag-content, .vco-timeline .vco-navigation .timenav .content .marker .flag-small .flag-content {
 	padding: 0px;
 }
+
