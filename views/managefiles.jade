@@ -1,33 +1,70 @@
 extends layout
 
 block content
-    h1.title Upload file
-    form.form-inline(action='/managefiles/new', method='post', role='form', enctype='multipart/form-data')
-        .form-group
-            label(for='inputFile') File input
-            input(type='file', name='inputFile', id='inputFile')
-            p Choose an mp4 or jpg file.
-        .form-group
-            label(for='name') Name
-            input.form-control(type='text', name='name', id='name')
-        button.btn.btn-primary(type='submit') Upload
-    hr
-    hr    
-    h1.title Manage files
-    table.table.table-striped
-        tr
-            th File ID
-            th File name
-            th
-            th
-            th
-        - each file in data
-            tr
-                td #{file._id}
-                td #{file.filename}
-                td 
-                    a(href='images/#{file._id}') View
-                td
-                    a(href='#') Edit
-                td
-                    a(href='#') Delete
+	h1.title Upload file
+	form.form-inline(action='/managefiles/new', method='post', role='form', enctype='multipart/form-data')
+		.form-group
+			label(for='inputFile') File input
+			input(type='file', name='inputFile', id='inputFile')
+			p Choose an mp4 or jpg file.
+		.form-group
+			label(for='name') Name
+			input.form-control(type='text', name='name', id='name')
+		button.btn.btn-primary(type='submit') Upload
+	hr
+	hr
+	h1.title Manage files
+	table.table.table-striped
+		tr
+			th File ID
+			th File name
+			th
+			th
+			th
+		- each file in data
+			tr
+				td #{file._id}
+				td #{file.filename}
+				td 
+					if file.filename.split('.')[1] == 'mp4'
+						a.video-modal-trigger(href='#', src='videos/#{file._id}' data-toggle="modal" data-target=".video-modal") View
+					else
+						a.image-modal-trigger(href='#', src='images/#{file._id}' data-toggle="modal" data-target=".image-modal") View
+				td
+					a(href='#') Edit
+				td
+					a(href='#') Delete
+	div.modal.fade.video-modal(tabindex='-1', role='dialog', aria-labelledby='videoModal' aria-hidden='true')
+		div.modal-dialog.modal-lg
+			div.modal-content
+				div.modal-header
+					button(type='button', data-dismiss='modal', aria-label='Close').close
+						span(aria-hidden='true') &times;
+					h4.modal-title.video-modal-title Title
+				div.modal-body
+					video.videoContent(controls='true', width='100%', title='', autoplay)
+						source(src='', type='video/mp4')
+	div.modal.fade.image-modal(tabindex='-1', role='dialog', aria-labelledby='imageModal' aria-hidden='true')
+		div.modal-dialog.modal-lg
+			div.modal-content
+				div.modal-header
+					button(type='button', data-dismiss='modal', aria-label='Close').close
+						span(aria-hidden='true') &times;
+					h4.modal-title.image-modal-title Title
+				div.modal-body
+					img.imageContent(src='')
+	script.
+		$('.video-modal-trigger').on('click', function(e) {
+			$('.video-modal-title').html($(e.currentTarget).attr('src'));
+			$('.videoContent source').attr('src', '../../' + $(e.currentTarget).attr('src'));
+			$('.videoContent').load();
+			$('.videoContent').removeClass('Hidden');
+		});
+		$('.video-modal').on('hidden.bs.modal', function(e) {
+			$('.videoContent').get(0).pause();
+			$('.videoContent').addClass('Hidden');
+		});
+		$('.image-modal-trigger').on('click', function(e) {
+			$('.image-modal-title').html($(e.currentTarget).attr('src'));
+			$('.imageContent').attr('src', '../../' + $(e.currentTarget).attr('src'));
+		});

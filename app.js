@@ -5,6 +5,11 @@ var bodyParser = require('body-parser');
 var http = require('http');
 var util = require('util');
 var multer  = require('multer');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var expressSession = require('express-session');
+var flash = require('connect-flash');
+var User = require('./models/user');
 var app = express();
 
 // view engine setup
@@ -19,15 +24,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(multer());
 
+app.use(expressSession({secret: 'mySecretKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 var routes = require('./routes/index');
 app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
 });
 
 // error handlers
@@ -35,27 +44,27 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('error', {
+			message: err.message,
+			error: err
+		});
+	});
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+	res.status(err.status || 500);
+	res.render('error', {
+		message: err.message,
+		error: {}
+	});
 });
 
 http.createServer(app).listen(3000, function(){
-    console.log('Express server listening on port ' + 3000);
+	console.log('Express server listening on port ' + 3000);
 });
 
 module.exports = app;

@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	.login-container
+		form(action='/login', method='post', role='form', enctype='multipart/form-data')
+			.form-group
+				label(for='username') Username
+				input.form-control(type='text',id='username',name='username',placeholder='Enter username')
+			.form-group
+				label(for='password') Password
+				input.form-control(type='password',id='password',name='password',placeholder='Password')
+			button.btn.btn-primary(type='submit') Submit

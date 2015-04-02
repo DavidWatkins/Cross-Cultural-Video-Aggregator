@@ -46,6 +46,10 @@ a {
 	width: 80%;
 }
 
+.imageContent {
+	width: 100%;
+}
+
 body .modal-lg {
     width: 60%; /* respsonsive width */
 }
@@ -73,4 +77,12 @@ body .modal-lg {
 
 .NoDisplay {
 	display: none;
+}
+
+.login-container {
+	width: 50%;
+	margin: auto;
+	border: 1px solid #939393;
+	padding: 30px;
+	border-radius: 10px;
 }

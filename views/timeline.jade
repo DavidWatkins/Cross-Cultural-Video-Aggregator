@@ -1,147 +1,147 @@
 extends layout
 
 block content
-    div(id='slideoptions').Hidden
-        ul
-            li.active.starttab Video Differences
-            li Clip Info
-            li Others
-    div(id='timelineCont').Hidden
-        div(id='timeline')
-    div.modal.fade.video-modal(tabindex='-1', role='dialog', aria-labelledby='videoModal' aria-hidden='true')
-        div.modal-dialog.modal-lg
-            div.modal-content
-                div.modal-header
-                    button(type='button', data-dismiss='modal', aria-label='Close').close
-                        span(aria-hidden='true') &times;
-                    h4.modal-title Title
-                div.modal-body
-                    video.videoContent(controls='true', width='100%', title='', autoplay)
-                        source(src='', type='video/mp4')
-    script.
-        $(document).on('DOMContentLoaded', function() {
-            var self = this,
-                flags;
+	div(id='slideoptions').Hidden
+		ul
+			li.active.starttab Video Differences
+			li Clip Info
+			li Others
+	div(id='timelineCont').Hidden
+		div(id='timeline')
+	div.modal.fade.video-modal(tabindex='-1', role='dialog', aria-labelledby='videoModal' aria-hidden='true')
+		div.modal-dialog.modal-lg
+			div.modal-content
+				div.modal-header
+					button(type='button', data-dismiss='modal', aria-label='Close').close
+						span(aria-hidden='true') &times;
+					h4.modal-title Title
+				div.modal-body
+					video.videoContent(controls='true', width='100%', title='', autoplay)
+						source(src='', type='video/mp4')
+	script.
+		$(document).on('DOMContentLoaded', function() {
+			var self = this,
+				flags;
 
-            createStoryJS({
-                type:       'timeline',
-                width:      '100%',
-                height:     '800',
-                source:     '../../timelinedata/#{event}/#{date}',
-                embed_id:   'timeline',
-                start_zoom_adjust: '3',
-                start_at_slide: '#{slide}'
-            });
+			createStoryJS({
+				type:	   'timeline',
+				width:	  '100%',
+				height:	 '800',
+				source:	 '../../timelinedata/#{event}/#{date}',
+				embed_id:   'timeline',
+				start_zoom_adjust: '3',
+				start_at_slide: '#{slide}'
+			});
 
-            setTimeout(function() {
-                $('.vco-container').prepend($('#slideoptions'));
-                $('.vco-container').prepend($('.vco-navigation'));
-                $('head').append('<link rel="stylesheet" type="text/css" href="../../css/timeline.css">');
-                $('#slideoptions').removeClass('Hidden');
-                $('#timelineCont').removeClass('Hidden');
-                $('.slider-item').on('DOMSubtreeModified', self.update);
-            },  1000);
+			setTimeout(function() {
+				$('.vco-container').prepend($('#slideoptions'));
+				$('.vco-container').prepend($('.vco-navigation'));
+				$('head').append('<link rel="stylesheet" type="text/css" href="../../css/timeline.css">');
+				$('#slideoptions').removeClass('Hidden');
+				$('#timelineCont').removeClass('Hidden');
+				$('.slider-item').on('DOMSubtreeModified', self.update);
+			},  1000);
 
-            setTimeout(function() {
-                self.setFlags(true);
-            }, 1500);
+			setTimeout(function() {
+				self.setFlags(true);
+			}, 1500);
 
-            $('#timeline').click(function(e) {
-                if($(e.target).parent().hasClass('vco-toolbar') || $(e.target).parent().hasClass('zoom-out') || $(e.target).parent().hasClass('zoom-in')) {
-                    $('.flag').addClass('Hidden');
-                    setTimeout( function() {
-                        self.setFlags(false);
-                        $('.flag').removeClass('Hidden');
-                    }, 1000);
-                }
-            });
+			$('#timeline').click(function(e) {
+				if($(e.target).parent().hasClass('vco-toolbar') || $(e.target).parent().hasClass('zoom-out') || $(e.target).parent().hasClass('zoom-in')) {
+					$('.flag').addClass('Hidden');
+					setTimeout( function() {
+						self.setFlags(false);
+						$('.flag').removeClass('Hidden');
+					}, 1000);
+				}
+			});
 
-            this.update = function() {
-                $('.vco-storyjs .vco-feature h3').remove();
-                $('.videoTrigger').off();
-                $('.videoTrigger').click(function(e) {
-                    $('.modal-title').html($(e.currentTarget).attr('video-type'));
-                    $('.videoContent source').attr('src', '../../videos/' + $(e.currentTarget).attr('video-src') + $(e.currentTarget).attr('video-period'));
-                    $('.videoContent').load();
-                    $('.videoContent').removeClass('Hidden');
-                });
-            }
+			this.update = function() {
+				$('.vco-storyjs .vco-feature h3').remove();
+				$('.videoTrigger').off();
+				$('.videoTrigger').click(function(e) {
+					$('.modal-title').html($(e.currentTarget).attr('video-type'));
+					$('.videoContent source').attr('src', '../../videos/' + $(e.currentTarget).attr('video-src') + $(e.currentTarget).attr('video-period'));
+					$('.videoContent').load();
+					$('.videoContent').removeClass('Hidden');
+				});
+			}
 
-            $('.modal').on('hidden.bs.modal', function(e) {
-                $('.videoContent').get(0).pause();
-                $('.videoContent').addClass('Hidden');
-            });
+			$('.modal').on('hidden.bs.modal', function(e) {
+				$('.videoContent').get(0).pause();
+				$('.videoContent').addClass('Hidden');
+			});
 
-            this.setFlags = function(init) {
-                var flags = $('.flag'),
-                    top;
-                for (i = 0; i < flags.length; i++) {
-                    top = $(flags[i]).css('top');
-                    if (top == '50px' || top == '5px') {
-                        $(flags[i]).css('top', '5px');
-                        if (init) {
-                            $(flags[i]).css('height', '140px');
-                            $(flags[i]).css('width', '220px')
-                            $(flags[i]).children().css('height', '138px');
-                            $($(flags[i]).children().children()[0]).css('height', '140px');
-                            $($(flags[i]).children().children()[0]).css('position', 'absolute');
-                            $($(flags[i]).children().children()[0]).css('z-index', '0');
-                            $($(flags[i]).children().children()[0]).css('width', '220px');
-                            $(flags[i]).children().children().children().css('height', '140px');
-                            $(flags[i]).children().children().children().css('width', '220px');
-                            $($(flags[i]).children().children()[1]).css('height', '20px');
-                            $($(flags[i]).children().children()[1]).css('color', '#000');
-                            $($(flags[i]).children().children()[1]).css('background-color', '#fff');
-                            $($(flags[i]).children().children()[1]).css('margin-top', '115px'); 
-                            $($(flags[i]).children().children()[1]).css('font-size', '12px');
-                            $($(flags[i]).children().children()[1]).css('padding', '2px 10px 0px 10px');
-                            $($(flags[i]).children().children()[1]).css('position', 'relative');
-                            $($(flags[i]).children().children()[1]).css('z-index', '1');
-                            $($(flags[i]).children().children()[1]).css('line-height', '150%');
-                            $($(flags[i]).children().children()[1]).css('opacity', '.8');
-                            $($(flags[i]).children().children()[1]).css('overflow', 'hidden');
-                        }
-                    } else if (top == '100px' || top == '70px') {
-                        $(flags[i]).css('top', '70px');
-                    }
-                    if (top == '1px' || top == '100px' && init) {
-                        $($(flags[i]).children().children()[0]).css('z-index', '0');
-                        $($(flags[i]).children().children()[0]).css('position', 'absolute');
-                        $($(flags[i]).children().children()[1]).css('height', '20px');
-                        $($(flags[i]).children().children()[1]).css('color', '#000');
-                        $($(flags[i]).children().children()[1]).css('background-color', '#fff');
-                        $($(flags[i]).children().children()[1]).css('margin-top', '60px'); 
-                        $($(flags[i]).children().children()[1]).css('font-size', '11px');
-                        $($(flags[i]).children().children()[1]).css('padding', '0px 10px 0px 10px');
-                        $($(flags[i]).children().children()[1]).css('position', 'relative');
-                        $($(flags[i]).children().children()[1]).css('z-index', '1');
-                        $($(flags[i]).children().children()[1]).css('line-height', '150%');
-                        $($(flags[i]).children().children()[1]).css('opacity', '.8');
-                        $($(flags[i]).children().children()[1]).css('overflow', 'hidden');
-                    }
-                }
-            }
+			this.setFlags = function(init) {
+				var flags = $('.flag'),
+					top;
+				for (i = 0; i < flags.length; i++) {
+					top = $(flags[i]).css('top');
+					if (top == '50px' || top == '5px') {
+						$(flags[i]).css('top', '5px');
+						if (init) {
+							$(flags[i]).css('height', '140px');
+							$(flags[i]).css('width', '220px')
+							$(flags[i]).children().css('height', '138px');
+							$($(flags[i]).children().children()[0]).css('height', '140px');
+							$($(flags[i]).children().children()[0]).css('position', 'absolute');
+							$($(flags[i]).children().children()[0]).css('z-index', '0');
+							$($(flags[i]).children().children()[0]).css('width', '220px');
+							$(flags[i]).children().children().children().css('height', '140px');
+							$(flags[i]).children().children().children().css('width', '220px');
+							$($(flags[i]).children().children()[1]).css('height', '20px');
+							$($(flags[i]).children().children()[1]).css('color', '#000');
+							$($(flags[i]).children().children()[1]).css('background-color', '#fff');
+							$($(flags[i]).children().children()[1]).css('margin-top', '115px'); 
+							$($(flags[i]).children().children()[1]).css('font-size', '12px');
+							$($(flags[i]).children().children()[1]).css('padding', '2px 10px 0px 10px');
+							$($(flags[i]).children().children()[1]).css('position', 'relative');
+							$($(flags[i]).children().children()[1]).css('z-index', '1');
+							$($(flags[i]).children().children()[1]).css('line-height', '150%');
+							$($(flags[i]).children().children()[1]).css('opacity', '.8');
+							$($(flags[i]).children().children()[1]).css('overflow', 'hidden');
+						}
+					} else if (top == '100px' || top == '70px') {
+						$(flags[i]).css('top', '70px');
+					}
+					if (top == '1px' || top == '100px' && init) {
+						$($(flags[i]).children().children()[0]).css('z-index', '0');
+						$($(flags[i]).children().children()[0]).css('position', 'absolute');
+						$($(flags[i]).children().children()[1]).css('height', '20px');
+						$($(flags[i]).children().children()[1]).css('color', '#000');
+						$($(flags[i]).children().children()[1]).css('background-color', '#fff');
+						$($(flags[i]).children().children()[1]).css('margin-top', '60px'); 
+						$($(flags[i]).children().children()[1]).css('font-size', '11px');
+						$($(flags[i]).children().children()[1]).css('padding', '0px 10px 0px 10px');
+						$($(flags[i]).children().children()[1]).css('position', 'relative');
+						$($(flags[i]).children().children()[1]).css('z-index', '1');
+						$($(flags[i]).children().children()[1]).css('line-height', '150%');
+						$($(flags[i]).children().children()[1]).css('opacity', '.8');
+						$($(flags[i]).children().children()[1]).css('overflow', 'hidden');
+					}
+				}
+			}
 
-            // handle the options bar navigation
-            $('#slideoptions ul li').click(function(e) {
-                var prevActive = self.getTabName($('#slideoptions ul li.active').html()),
-                    newActive =  self.getTabName($(e.currentTarget).html());
-                if (prevActive != newActive) {
-                    $('#slideoptions ul li.active').removeClass('active');
-                    $(e.currentTarget).addClass('active');
-                     $('.row.' + prevActive).addClass('NoDisplay');
-                     $('.row.' + newActive).removeClass('NoDisplay');
-                }    
-            });
+			// handle the options bar navigation
+			$('#slideoptions ul li').click(function(e) {
+				var prevActive = self.getTabName($('#slideoptions ul li.active').html()),
+					newActive =  self.getTabName($(e.currentTarget).html());
+				if (prevActive != newActive) {
+					$('#slideoptions ul li.active').removeClass('active');
+					$(e.currentTarget).addClass('active');
+					 $('.row.' + prevActive).addClass('NoDisplay');
+					 $('.row.' + newActive).removeClass('NoDisplay');
+				}	
+			});
 
-            this.getTabName = function(name) {
-                if (name == 'Video Differences') {
-                    return 'videoDifferences';
-                } else if (name == 'Clip Info') {
-                    return 'clipInfo';
-                } else {
-                    return 'others';
-                }
-            }
+			this.getTabName = function(name) {
+				if (name == 'Video Differences') {
+					return 'videoDifferences';
+				} else if (name == 'Clip Info') {
+					return 'clipInfo';
+				} else {
+					return 'others';
+				}
+			}
 
-        });
+		});
