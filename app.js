@@ -7,7 +7,7 @@ var util = require('util');
 var multer  = require('multer');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var expressSession = require('express-session');
+var session = require('express-session');
 var flash = require('connect-flash');
 var User = require('./models/user');
 var app = express();
@@ -24,7 +24,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(multer());
 
-app.use(expressSession({secret: 'mySecretKey'}));
+app.use(session({
+    secret: 'AED019284KZDE', 
+    saveUninitialized: true,
+    resave: true
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
