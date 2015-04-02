@@ -61,6 +61,8 @@ https://www.digitalocean.com/community/tutorials/how-to-deploy-node-js-applicati
 You may need to change line 16 of routes/index.js to connect to the proper db url (replacing
 'mongodb://localhost:27017/gridfs').
 
+Backing up and restoring with MongoDB: http://docs.mongodb.org/manual/tutorial/backup-with-mongodump/
+
 ## Todo
 * Manage rels edit
 * Manage files edit
