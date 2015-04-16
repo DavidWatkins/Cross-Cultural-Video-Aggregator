@@ -27,7 +27,7 @@ block content
 				type:	   'timeline',
 				width:	  '100%',
 				height:	 '800',
-				source:	 '../../timelinedata/#{event}/#{date}',
+				source:	 '../../../timelinedata/#{event}/#{date}/#{countries}',
 				embed_id:   'timeline',
 				start_zoom_adjust: '3',
 				start_at_slide: '#{slide}'
@@ -36,7 +36,7 @@ block content
 			setTimeout(function() {
 				$('.vco-container').prepend($('#slideoptions'));
 				$('.vco-container').prepend($('.vco-navigation'));
-				$('head').append('<link rel="stylesheet" type="text/css" href="../../css/timeline.css">');
+				$('head').append('<link rel="stylesheet" type="text/css" href="../../../css/timeline.css">');
 				$('#slideoptions').removeClass('Hidden');
 				$('#timelineCont').removeClass('Hidden');
 				$('.slider-item').on('DOMSubtreeModified', self.update);
@@ -61,7 +61,7 @@ block content
 				$('.videoTrigger').off();
 				$('.videoTrigger').click(function(e) {
 					$('.modal-title').html($(e.currentTarget).attr('video-type'));
-					$('.videoContent source').attr('src', '../../videos/' + $(e.currentTarget).attr('video-src') + $(e.currentTarget).attr('video-period'));
+					$('.videoContent source').attr('src', '../../../videos/' + $(e.currentTarget).attr('video-src') + $(e.currentTarget).attr('video-period'));
 					$('.videoContent').load();
 					$('.videoContent').removeClass('Hidden');
 				});

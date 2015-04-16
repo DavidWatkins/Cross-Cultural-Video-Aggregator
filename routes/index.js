@@ -150,7 +150,7 @@ router.get('/manageusers/del/:id', ensureAuthenticated, ensureAdmin, function(re
 });
 
 // get timeline json data to display
-router.get('/timelinedata/:event/:date', ensureAuthenticated, function(req, res) {
+router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, function(req, res) {
 	var timeline = {
 		headline: "Video comparisons for '" + req.params.event + "'",
 		type: "default",
@@ -165,11 +165,19 @@ router.get('/timelinedata/:event/:date', ensureAuthenticated, function(req, res)
 	countries = [],
 	dates = [],
 	dateCounts = [],
+	params = {},
 	tags,
 	timelinedate,
 	index;
+	if (req.params.countries != 'all') {
+		countries = req.params.countries.split(',');
+		params.countries = { $in: countries };
+	}
+	params.event = req.params.event;
+	console.log(params);
+
 	// query for info
-	db.collection('rels').find({event: req.params.event}).sort({ type: 1 }).toArray(function(err, data) {
+	db.collection('rels').find(params).sort({ type: 1 }).toArray(function(err, data) {
 		// make timeline obj
 		for (i = 0; i < data.length; i++) {
 			index = dates.indexOf(data[i].date);
@@ -177,14 +185,26 @@ router.get('/timelinedata/:event/:date', ensureAuthenticated, function(req, res)
 				 timelinedate = {
 					startDate: data[i].date,
 					endDate: data[i].date,
-					headline: "<img src='../../images/" + data[i].screencap_id + "'>" + [].concat.apply([], data[i].tags).join(' '),
+					headline: "<img src='../../../images/" + data[i].screencap_id + "'>" + [].concat.apply([], data[i].tags).join(' '),
 					text: "<div class='row clipInfo NoDisplay'>Clip Info</div><div class='row others NoDisplay'>Others</div><div class='row videoDifferences'>",
 					tag: "",
 					classname: data[i].date,
 					asset: {
-						thumbnail: "../../images/" + data[i].screencap_id
+						thumbnail: "../../../images/" + data[i].screencap_id
 					}
 				}
+				console.log(data[i].countries);
+				if (req.params.countries != 'all') {
+					temp = [];
+					for (j = 0; j < data[i].countries.length; j++) {
+						if (countries.indexOf(data[i].countries[j]) != -1) {
+							temp.push(data[i].countries[j]);
+						}
+					}
+					data[i].countries = temp;
+				}
+				console.log(data[i].countries);
+				console.log('\n');
 				if (data[i].countries.length != 1) {
 					timelinedate.tag = "Shared"
 				} else {
@@ -198,8 +218,8 @@ router.get('/timelinedata/:event/:date', ensureAuthenticated, function(req, res)
 				// if the previous one was not common, override some attributes
 				if (data[i].countries.length != 1 && timeline.date[index].tag != "Shared") {
 					timeline.date[index].tag = "Shared";
-					timeline.date[index].asset.thumbnail = "../../images/" + data[i].screencap_id;
-					timeline.date[index].headline = "<img src='../../images/" + data[i].screencap_id + "'>";
+					timeline.date[index].asset.thumbnail = "../../../images/" + data[i].screencap_id;
+					timeline.date[index].headline = "<img src='../../../images/" + data[i].screencap_id + "'>";
 				}
 			}
 			for (j = 0; j < data[i].countries.length; j++) {
@@ -226,7 +246,7 @@ router.get('/timelinedata/:event/:date', ensureAuthenticated, function(req, res)
 				}
 				timeline.date[index].text += "</div></div>";
 			}
-			timeline.date[index].text += "<div class='col-md-2 rel'><div class='row'><div class='col-md-12'><h4>" + data[i].type + "</h4></div><div class='col-md-12'><img class='videoTrigger' data-toggle='modal' data-target='.video-modal' video-type='" + data[i].type + "' video-src='" + data[i].video_id + "' video-period='#t=" + data[i].video_start + "," + data[i].video_end + "' src='../../images/" + data[i].screencap_id + "'></div>";
+			timeline.date[index].text += "<div class='col-md-2 rel'><div class='row'><div class='col-md-12'><h4>" + data[i].type + "</h4></div><div class='col-md-12'><img class='videoTrigger' data-toggle='modal' data-target='.video-modal' video-type='" + data[i].type + "' video-src='" + data[i].video_id + "' video-period='#t=" + data[i].video_start + "," + data[i].video_end + "' src='../../../images/" + data[i].screencap_id + "'></div>";
 			tags = [];
 			for (j = 0; j < countries.length; j++) {
 				tag = { country: countries[j] };
@@ -258,11 +278,12 @@ router.get('/timelinedata/:event/:date', ensureAuthenticated, function(req, res)
 	});
 });
 
-router.get('/timeline/:event/:date', ensureAuthenticated, function(req, res) {
+router.get('/timeline/:event_name/:date/:countries', ensureAuthenticated, function(req, res) {
+	console.log(req.params.event_name, req.params.date, req.params.countries);
 	var datereq = req.params.date.replace('-', '/').replace('-', '/'),
 		slide = 0,
 		dates = [];
-	db.collection('rels').find({event: req.params.event}).sort({ date: 1 }).toArray(function(err, data) {
+	db.collection('rels').find({event: req.params.event_name}).sort({ date: 1 }).toArray(function(err, data) {
 		// figure out what slide to start on
 		for (i = 0; i < data.length; i++) {
 			if (dates.indexOf(data[i].date) == -1) {
@@ -279,8 +300,9 @@ router.get('/timeline/:event/:date', ensureAuthenticated, function(req, res) {
 		}
 		res.render('timeline', {
 			title: 'Timeline', 
-			event: req.params.event,
+			event: req.params.event_name,
 			date: req.params.date,
+			countries: req.params.countries,
 			slide: slide
 		});
 	});
