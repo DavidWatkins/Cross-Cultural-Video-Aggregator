@@ -23,12 +23,9 @@ block content
 			th Username
 			th Role
 			th
-			th
 		- each user in data
 			tr
 				td #{user.username}
 				td #{user.role}
-				td
-					a(href='#') Edit
 				td
 					a(href='manageusers/del/#{user._id}') Delete

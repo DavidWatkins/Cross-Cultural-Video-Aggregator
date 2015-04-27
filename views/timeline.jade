@@ -23,6 +23,7 @@ block content
 			var self = this,
 				flags;
 
+			// create timeline
 			createStoryJS({
 				type:	   'timeline',
 				width:	  '100%',
@@ -33,19 +34,32 @@ block content
 				start_at_slide: '#{slide}'
 			});
 
-			setTimeout(function() {
-				$('.vco-container').prepend($('#slideoptions'));
-				$('.vco-container').prepend($('.vco-navigation'));
-				$('head').append('<link rel="stylesheet" type="text/css" href="../../../css/timeline.css">');
-				$('#slideoptions').removeClass('Hidden');
-				$('#timelineCont').removeClass('Hidden');
-				$('.slider-item').on('DOMSubtreeModified', self.update);
-			},  1000);
+			// initialize changes to timeline
+			var count = 0;
+			$('#timeline').on('DOMSubtreeModified', function() {
+				count++;
+				// the basic elements have loaded, can update them
+				if (count == 80) {
+					// rearrange so nav is on top, black link bar in middle
+					$('.vco-container').prepend($('#slideoptions'));
+					$('.vco-container').prepend($('.vco-navigation'));
+					$('#slideoptions').removeClass('Hidden');
+					$('#timelineCont').removeClass('Hidden');
+					// add style sheet for overriding timeline
+					$('head').append('<link rel="stylesheet" type="text/css" href="../../../css/timeline.css">');
+					// if there is an update to slider items, update them
+					$('.slider-item').on('DOMSubtreeModified', self.update);
+				}
+				// all of the flags have loaded, can update them
+				var temp = count;
+				setTimeout(function() {
+					if (temp == count) {
+						self.setFlags(true);
+					}
+				}, 300);
+			});
 
-			setTimeout(function() {
-				self.setFlags(true);
-			}, 1500);
-
+			// deal with flag styling problems with zoom in or out
 			$('#timeline').click(function(e) {
 				if($(e.target).parent().hasClass('vco-toolbar') || $(e.target).parent().hasClass('zoom-out') || $(e.target).parent().hasClass('zoom-in')) {
 					$('.flag').addClass('Hidden');
@@ -56,9 +70,11 @@ block content
 				}
 			});
 
+			// updates the slider items
 			this.update = function() {
 				var tags = $('.tags h5'),
-					i;
+					i,
+					j;
 				$('.vco-storyjs .vco-feature h3').remove();
 				$('.videoTrigger').off();
 				$('.videoTrigger').click(function(e) {
@@ -67,29 +83,41 @@ block content
 					$('.videoContent').load();
 					$('.videoContent').removeClass('Hidden');
 				});
-				$('.tags h5').off();
 				for (i=0; i<tags.length; i++) {
 					var isOverflowing = $(tags[i]).prop('clientHeight') < $(tags[i]).prop('scrollHeight');
 					if (isOverflowing) {
+						$(tags[i]).off();
 						$(tags[i]).css('cursor', 'pointer');
+						$(tags[i]).click(function(e) {
+							var label;
+							// figure out which label to also update
+							temptags = $(e.currentTarget).parent().parent().children('.tags');
+							for (j=0; j<temptags.length; j++) {
+								if ($(temptags[j]).children().html() == $(e.currentTarget).html()) {
+									label = $(e.currentTarget).parent().parent().parent().parent().children('.labels').children().children()[j];
+								}
+							}
+							if ($(e.currentTarget).css('overflow') == 'hidden') {
+								$(e.currentTarget).css('height', 'auto');
+								$(e.currentTarget).css('overflow', 'visible');
+								$(label).css('height', $(e.currentTarget).css('height'));
+							} else {
+								$(e.currentTarget).css('height', '36px');
+								$(e.currentTarget).css('overflow', 'hidden');
+								$(label).css('height', $(e.currentTarget).css('height'));
+							}
+						});
 					}
-				};
-				$('.tags h5').click(function(e) {
-					if ($(e.currentTarget).css('overflow') == 'hidden') {
-						$(e.currentTarget).css('height', 'auto');
-						$(e.currentTarget).css('overflow', 'visible');
-					} else {
-						$(e.currentTarget).css('height', '36px');
-						$(e.currentTarget).css('overflow', 'hidden');
-					}
-				});
+				}
 			}
 
+			// ends video when modal is closed
 			$('.modal').on('hidden.bs.modal', function(e) {
 				$('.videoContent').get(0).pause();
 				$('.videoContent').addClass('Hidden');
 			});
 
+			// restyles the flags on navigation bar
 			this.setFlags = function(init) {
 				var flags = $('.flag'),
 					top;

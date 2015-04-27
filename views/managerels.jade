@@ -22,12 +22,14 @@ block content
 			th
 			th
 		- each rel in data
+			- var tags = JSON.stringify(rel.tags)
+			- var countries = JSON.stringify(rel.countries)
 			tr
 				td #{rel.event}
 				td #{rel.date}
 				td #{rel.type}
-				td #{rel.countries}
-				td #{rel.tags}
+				td #{countries}
+				td #{tags}
 				td #{rel.video_id}
 				td #{rel.video_start}
 				td #{rel.video_end}
@@ -82,8 +84,8 @@ block content
 			$('.edit-event').attr('value', $(info[0]).html());
 			$('.edit-date').attr('value', $(info[1]).html());
 			$('.edit-type').attr('value', $(info[2]).html());
-			$('.edit-countries').attr('value', '[' + $(info[3]).html() + ']');
-			$('.edit-tags').attr('value', '[' + $(info[4]).html() + ']');
+			$('.edit-countries').attr('value', $(info[3]).html());
+			$('.edit-tags').attr('value', $(info[4]).html());
 			$('.edit-videoid').attr('value', $(info[5]).html());
 			$('.edit-videostart').attr('value', $(info[6]).html());
 			$('.edit-videoend').attr('value', $(info[7]).html());

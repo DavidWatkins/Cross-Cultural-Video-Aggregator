@@ -13,22 +13,22 @@ var fs = require('fs');
 var db;
 var gfs;
 
+// connects to db
 mongo.MongoClient.connect('mongodb://localhost:27017/gridfs', function(err, database) {
 	if (err) throw err;
 	db = database;
 	gfs = new Grid(db, mongo);
 });
 
+// ues for handling sessions
 passport.serializeUser(function(user, done) {
   done(null, user._id);
 });
- 
 passport.deserializeUser(function(id, done) {
   db.collection('users').findOne({_id: ObjectID(id)}, function(err, user) {
 	done(err, user);
   });
 });
-
 passport.use('login', new LocalStrategy ({
 	usernameField: 'username',
 	passwordField: 'password'
@@ -37,17 +37,19 @@ function(username, password, done) {
 	User.isValidUserPassword(username, password, db, done);
 }));
 
+// use to make sure logged in
 function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
 	res.redirect('/login');
 }
 
+// use to check if admin or not
 function ensureAdmin(req, res, next) {
 	if (req.user.role == 'Admin') { return next(); };
 	res.redirect('/');
 }
 
-/* GET home page. */
+// get home page and list events
 router.get('/', ensureAuthenticated, function(req, res) {
   db.collection('rels').find({},{event: 1, _id: 0 }).toArray(function(err, data) {
 	var events = [],
@@ -61,7 +63,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
   });
 });
 
-//local submission of email and password
+// local submission of email and password
 router.get('/login', function(req, res) {
 	res.render('login', { title: 'Login', message: req.flash('error') });
 });
@@ -72,6 +74,7 @@ router.post('/login',
 	}
 );
 
+// log out
 router.get('/logout', function(req, res){
 	req.logout();
 	res.redirect('/login');
@@ -102,7 +105,18 @@ router.get('/managerels/del/:id', ensureAuthenticated, ensureAdmin, function(req
 	});
 });
 router.post('/managerels/edit/:id', ensureAuthenticated, ensureAdmin, function(req, res){
-	db.collection('rels').update({_id: ObjectID(req.params.id)}, {$set: {date: req.body.date}}, function(err, data) {
+	var updateobj = {
+		event: req.body.event,
+		date: req.body.date,
+		type: req.body.type,
+		countries: JSON.parse(req.body.countries),
+		tags: JSON.parse(req.body.tags),
+		video_id: req.body.videoid,
+		video_start: JSON.parse(req.body.videostart),
+		video_end: JSON.parse(req.body.videoend),
+		screencap_id: req.body.screencapid
+	}
+	db.collection('rels').update({_id: ObjectID(req.params.id)}, {$set: updateobj}, function(err, data) {
 		res.redirect('/managerels');
 	});
 });
@@ -119,7 +133,6 @@ router.get('/managefiles', ensureAuthenticated, ensureAdmin, function(req, res) 
 router.post('/managefiles/new', ensureAuthenticated, ensureAdmin, function(req, res) {
 	var r = res,
 		writestream = gfs.createWriteStream({filename: req.body.name});
-	console.log(req.body.name, req.files.inputFile.path);
 	fs.createReadStream(req.files.inputFile.path).on('end', function() {
 		setTimeout(function () {
 			r.redirect('/managefiles');
@@ -127,6 +140,19 @@ router.post('/managefiles/new', ensureAuthenticated, ensureAdmin, function(req, 
 	  }).on('error', function() {
 		res.send('ERR');
 	  }).pipe(writestream);
+});
+router.get('/managefiles/del/:id', ensureAuthenticated, ensureAdmin, function(req, res) {
+	gfs.remove({_id: ObjectID(req.params.id)}, function(err, data) {
+		res.redirect('/managefiles');
+	});
+});
+router.post('/managefiles/edit/:id', ensureAuthenticated, ensureAdmin, function(req, res){
+	var updateobj = {
+		filename: req.body.name
+	};
+	db.collection('fs.files').update({_id: ObjectID(req.params.id)}, {$set: updateobj}, function(err, data) {
+		res.redirect('/managefiles');
+	});
 });
 
 // for account management
@@ -174,18 +200,40 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 	tags,
 	timelinedate,
 	index;
+
+	// make params for query of specific countries rather than all countries
 	if (req.params.countries != 'all') {
 		countries = req.params.countries.split(',');
 		params.countries = { $in: countries };
 	}
+	// param for event query
 	params.event = req.params.event;
 
 	// query for info
 	db.collection('rels').find(params).sort({ type: 1 }).toArray(function(err, data) {
-		// make timeline obj
+		// first find out what 'all' countries are if dealing with all
+		if (req.params.countries == 'all') {
+			for (i = 0; i < data.length; i++) {
+				for (j = 0; j < data[i].countries.length; j++) {
+					// tracking which countries
+					if (countries.indexOf(data[i].countries[j]) == -1) {
+						countries.push(data[i].countries[j]);
+					}
+				}
+			}
+		}
+
+		// go through each rel and create timeline object for it
 		for (i = 0; i < data.length; i++) {
+			// need only one object for each date, so we must track all of the dates
 			index = dates.indexOf(data[i].date);
+			// if the date hasn't been seen yet, create a new object
 			if (index == -1) {
+				// track the date
+				dates.push(data[i].date);
+				dateCounts.push([0,0,0]);	// tracks [commons,diffs,commons + diffs]
+				index = dates.indexOf(data[i].date);
+				//initialize the object
 				 timelinedate = {
 					startDate: data[i].date,
 					endDate: data[i].date,
@@ -197,6 +245,8 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 						thumbnail: "../../../images/" + data[i].screencap_id
 					}
 				}
+				// if we are looking for specific countries only we go through this rels countries array
+				// and get rid of the countries we do not want from it
 				if (req.params.countries != 'all') {
 					temp = [];
 					for (j = 0; j < data[i].countries.length; j++) {
@@ -206,29 +256,25 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 					}
 					data[i].countries = temp;
 				}
+				// if there is more than 1 country, it belongs to the 'Shared' tag and is rendered as a large
+				// image on the timeline, otherwise it belongs to a specific coutnry
 				if (data[i].countries.length != 1) {
 					timelinedate.tag = "Shared"
 				} else {
 					timelinedate.tag = data[i].countries[0].toString();
 				}
-				dates.push(data[i].date);
-				dateCounts.push([0,0,0]);
+				// push this date object to the full timeline object
 				timeline.date.push(timelinedate);
-				index = dates.indexOf(data[i].date);
+			// otherwise the date has been seen, we will extend the previously created object
 			} else {
-				// if the previous one was not common, override some attributes
+				// if the previous object was not common, override some attributes
 				if (data[i].countries.length != 1 && timeline.date[index].tag != "Shared") {
 					timeline.date[index].tag = "Shared";
 					timeline.date[index].asset.thumbnail = "../../../images/" + data[i].screencap_id;
 					timeline.date[index].headline = "<img src='../../../images/" + data[i].screencap_id + "'>";
 				}
 			}
-			for (j = 0; j < data[i].countries.length; j++) {
-				// tracking which countries
-				if (countries.indexOf(data[i].countries[j]) == -1) {
-					countries.push(data[i].countries[j]);
-				}
-			}
+			// track what number commonality or difference it is
 			if (data[i].type == 'common') {
 				dateCounts[index][0] += 1;
 				data[i].type = 'Common ' + dateCounts[index][0];
@@ -237,7 +283,8 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 				data[i].type = 'Diff ' + dateCounts[index][1];
 			}
 		}
-		// prettify tags for each rel and add to text
+
+		// prettify tags for each rel and add html to text
 		for (i = 0; i < data.length; i++) {
 			index = dates.indexOf(data[i].date);
 			if (dateCounts[index][2] % 4 == 0) {
@@ -276,29 +323,38 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 		for (i = 0; i < timeline.date.length; i++) {
 			timeline.date[i].text += "</div>";
 		}
+
+		// send json object
 		res.json({timeline: timeline});
 	});
 });
 
+// get actual timeline page and figures out which slide to start on if date is specified
 router.get('/timeline/:event_name/:date/:countries', ensureAuthenticated, function(req, res) {
 	var datereq = req.params.date.replace('-', '/').replace('-', '/'),
 		slide = 0,
 		dates = [];
-	db.collection('rels').find({event: req.params.event_name}).sort({ date: 1 }).toArray(function(err, data) {
-		// figure out what slide to start on
-		for (i = 0; i < data.length; i++) {
-			if (dates.indexOf(data[i].date) == -1) {
-				if (datereq == data[i].date) {
-					slide = i + 1;
-					break;
+	if (req.params.date != 'all') {
+		db.collection('rels').find({event: req.params.event_name}).sort({ date: 1 }).toArray(function(err, data) {
+			// figure out what slide to start on
+			for (i = 0; i < data.length; i++) {
+				if (dates.indexOf(data[i].date) == -1) {
+					if (datereq == data[i].date) {
+						slide = i + 1;
+						break;
+					}
+					dates.push(data[i].date);
 				}
-				dates.push(data[i].date);
 			}
-		}
-		if (slide == 0) {
-			console.log('no matching date');
-			console.log(dates, datereq);
-		}
+			res.render('timeline', {
+				title: 'Timeline', 
+				event: req.params.event_name,
+				date: req.params.date,
+				countries: req.params.countries,
+				slide: slide
+			});
+		});
+	} else {
 		res.render('timeline', {
 			title: 'Timeline', 
 			event: req.params.event_name,
@@ -306,10 +362,10 @@ router.get('/timeline/:event_name/:date/:countries', ensureAuthenticated, functi
 			countries: req.params.countries,
 			slide: slide
 		});
-	});
+	}
 });
 
-// for displaying image
+// for serving images
 router.get('/images/:id', ensureAuthenticated, function(req, res) {
 	var readstream;
 	res.writeHead(200, {
@@ -322,14 +378,14 @@ router.get('/images/:id', ensureAuthenticated, function(req, res) {
 // for streaming video
 router.get('/videos/:id', ensureAuthenticated, function(req, res) {
 	db.collection('fs.files').findOne(new ObjectID(req.params.id), function(err, data) {
-		var range = req.headers.range;
-		var parts = range.replace(/bytes=/, "").split("-");
-		var partialstart = parts[0];
-		var partialend = parts[1];
-		var start = parseInt(partialstart, 10);
-		var end = partialend ? parseInt(partialend, 10) : data.length - 1;
-		var chunksize = (end-start) + 1;
-		var readstream = gfs.createReadStream({_id: req.params.id, range: {startPos: start, endPos: end }});
+		var range = req.headers.range,
+			parts = range.replace(/bytes=/, "").split("-"),
+			partialstart = parts[0],
+			partialend = parts[1],
+			start = parseInt(partialstart, 10),
+			end = partialend ? parseInt(partialend, 10) : data.length - 1,
+			chunksize = (end-start) + 1,
+			readstream = gfs.createReadStream({_id: req.params.id, range: {startPos: start, endPos: end }});
 		res.openstream = readstream;
 		res.writeHead(206, {
 			'Content-Type': 'video/mp4',
