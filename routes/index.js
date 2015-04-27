@@ -101,6 +101,11 @@ router.get('/managerels/del/:id', ensureAuthenticated, ensureAdmin, function(req
 		res.redirect('/managerels');
 	});
 });
+router.post('/managerels/edit/:id', ensureAuthenticated, ensureAdmin, function(req, res){
+	db.collection('rels').update({_id: ObjectID(req.params.id)}, {$set: {date: req.body.date}}, function(err, data) {
+		res.redirect('/managerels');
+	});
+});
 
 // for file management
 router.get('/managefiles', ensureAuthenticated, ensureAdmin, function(req, res) {
@@ -174,7 +179,6 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 		params.countries = { $in: countries };
 	}
 	params.event = req.params.event;
-	console.log(params);
 
 	// query for info
 	db.collection('rels').find(params).sort({ type: 1 }).toArray(function(err, data) {
@@ -193,7 +197,6 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 						thumbnail: "../../../images/" + data[i].screencap_id
 					}
 				}
-				console.log(data[i].countries);
 				if (req.params.countries != 'all') {
 					temp = [];
 					for (j = 0; j < data[i].countries.length; j++) {
@@ -203,8 +206,6 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 					}
 					data[i].countries = temp;
 				}
-				console.log(data[i].countries);
-				console.log('\n');
 				if (data[i].countries.length != 1) {
 					timelinedate.tag = "Shared"
 				} else {
@@ -253,10 +254,11 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 				index = data[i].countries.indexOf(countries[j]);
 				if (index == -1) {
 					tag.tags = '-';
-				} else if (data[i].tags[index].length == 0) {
-					tag.tags = 'No tags detected';
 				} else {
 					tag.tags = data[i].tags[index].join(' ');
+					if (tag.tags == '') {
+						tag.tags = 'No tags detected';
+					}
 				}
 				index = dates.indexOf(data[i].date);
 				timeline.date[index].text += "<div class='col-md-12 tags'><h5>" + tag.tags + "</h5></div>";
@@ -279,7 +281,6 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 });
 
 router.get('/timeline/:event_name/:date/:countries', ensureAuthenticated, function(req, res) {
-	console.log(req.params.event_name, req.params.date, req.params.countries);
 	var datereq = req.params.date.replace('-', '/').replace('-', '/'),
 		slide = 0,
 		dates = [];

@@ -33,6 +33,59 @@ block content
 				td #{rel.video_end}
 				td #{rel.screencap_id}
 				td
-					a(href='#') Edit
+					a.edit-modal-trigger(href='#', src='#{rel._id}' data-toggle="modal" data-target=".edit-modal") Edit
 				td
 					a(href='managerels/del/#{rel._id}') Delete
+	div.modal.fade.edit-modal(tabindex='-1', role='dialog', aria-labelledby='videoModal' aria-hidden='true')
+		div.modal-dialog.modal-lg
+			div.modal-content
+				div.modal-header
+					button(type='button', data-dismiss='modal', aria-label='Close').close
+						span(aria-hidden='true') &times;
+					h4.modal-title.edit-modal-title Edit
+				div.modal-body
+					form(action='/managerels/edit/', method='post', role='form')
+						.form-group
+							label(for='event') Event
+							input.form-control.edit-event(type='text', name='event', id='event')
+						.form-group
+							label(for='date') Date
+							input.form-control.edit-date(type='text', name='date', id='date')
+						.form-group
+							label(for='type') Type
+							input.form-control.edit-type(type='text', name='type', id='type')
+						.form-group
+							label(for='countries') Countries
+							input.form-control.edit-countries(type='text', name='countries', id='countries')
+						.form-group
+							label(for='tags') Tags
+							input.form-control.edit-tags(type='text', name='tags', id='tags')
+						.form-group
+							label(for='videoid') Video ID
+							input.form-control.edit-videoid(type='text', name='videoid', id='videoid')
+						.form-group
+							label(for='videostart') Video Start
+							input.form-control.edit-videostart(type='text', name='videostart', id='videostart')
+						.form-group
+							label(for='videoend') Video End
+							input.form-control.edit-videoend(type='text', name='videoend', id='videoend')
+						.form-group
+							label(for='screencapid') Screencap ID
+							input.form-control.edit-screencapid(type='text', name='screencapid', id='screencapid')
+						button.btn.btn-primary(type='submit') Submit
+	script.
+		$('.edit-modal-trigger').on('click', function(e) {
+			var info = $(e.currentTarget).parent().siblings(),
+				i;
+			$('.edit-modal-title').html('Edit rel ' + $(e.currentTarget).attr('src'));
+			$('.modal-body form').attr('action', '/managerels/edit/' + $(e.currentTarget).attr('src'));
+			$('.edit-event').attr('value', $(info[0]).html());
+			$('.edit-date').attr('value', $(info[1]).html());
+			$('.edit-type').attr('value', $(info[2]).html());
+			$('.edit-countries').attr('value', '[' + $(info[3]).html() + ']');
+			$('.edit-tags').attr('value', '[' + $(info[4]).html() + ']');
+			$('.edit-videoid').attr('value', $(info[5]).html());
+			$('.edit-videostart').attr('value', $(info[6]).html());
+			$('.edit-videoend').attr('value', $(info[7]).html());
+			$('.edit-screencapid').attr('value', $(info[8]).html());
+		});

@@ -7,9 +7,14 @@ a {
   color: #00B7FF;
 }
 
+.tags h5 {
+	height: 36px;
+	overflow: hidden;
+}
+
 .rel {
 	text-align: center;
-	margin-right: 50px;
+	margin-right: 20px;
 }
 
 .rel .row .col-md-12:nth-child(3) {
@@ -39,7 +44,7 @@ a {
 
 .labels {
 	text-align: center;
-	margin-top: 208px;
+	margin-top: 170px;
 }
 
 .video-player {
@@ -85,4 +90,8 @@ body .modal-lg {
 	border: 1px solid #939393;
 	padding: 30px;
 	border-radius: 10px;
+}
+
+.vco-storyjs .col-md-12 img {
+	height: 112px;
 }
