@@ -1,3 +1,12 @@
+.vco-storyjs .vco-feature .slider, .vco-storyjs .vco-feature .vco-slider {
+	margin-top: -40px;
+	padding-top: 60px;
+}
+
+.vco-timeline .vco-navigation .timenav-background .timenav-interval-background {
+	z-index: -1;
+}
+
 .vco-timeline .vco-navigation {
 	height: 150px;
 }

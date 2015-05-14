@@ -84,11 +84,14 @@ block content
 					$('.videoContent').removeClass('Hidden');
 				});
 				for (i=0; i<tags.length; i++) {
-					var isOverflowing = $(tags[i]).prop('clientHeight') < $(tags[i]).prop('scrollHeight');
+					var tag = $(tags[i]),
+						isOverflowing = tag.prop('clientHeight') < tag.prop('scrollHeight');
 					if (isOverflowing) {
-						$(tags[i]).off();
-						$(tags[i]).css('cursor', 'pointer');
-						$(tags[i]).click(function(e) {
+						tag.off();
+						tag.html(tag.html());
+						tag.css('cursor', 'pointer');
+						tag.css('color', '#428bca');
+						tag.click(function(e) {
 							var label;
 							// figure out which label to also update
 							temptags = $(e.currentTarget).parent().parent().children('.tags');
@@ -100,11 +103,11 @@ block content
 							if ($(e.currentTarget).css('overflow') == 'hidden') {
 								$(e.currentTarget).css('height', 'auto');
 								$(e.currentTarget).css('overflow', 'visible');
-								$(label).css('height', $(e.currentTarget).css('height'));
+								$(label).css('height', $(e.currentTarget).parent().css('height'));
 							} else {
 								$(e.currentTarget).css('height', '36px');
 								$(e.currentTarget).css('overflow', 'hidden');
-								$(label).css('height', $(e.currentTarget).css('height'));
+								$(label).css('height', $(e.currentTarget).parent().css('height'));
 							}
 						});
 					}

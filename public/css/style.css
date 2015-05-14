@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding: 25px 50px 25px 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -12,7 +12,15 @@ a {
 	overflow: hidden;
 }
 
+/*.rel .row .col-md-12.tags:nth-child(odd) {
+	background: #f6f6f6;
+}
+.rel .row .col-md-12.tags:nth-child(even) {
+	background: #ededed;
+}*/
+
 .rel {
+	padding-top: 10px;
 	text-align: center;
 	margin-right: 20px;
 }
@@ -24,6 +32,10 @@ a {
 .title {
 	margin-bottom: 50px;
 	font-style: italic;
+}
+
+.col-md-12.tags {
+	margin-bottom: 0px;
 }
 
 .col-md-12 {
@@ -39,12 +51,12 @@ a {
 }
 
 .tags {
-	margin-top: 10px;
+	padding-top: 10px;
 }
 
 .labels {
 	text-align: center;
-	margin-top: 170px;
+	margin-top: 190px;
 }
 
 .video-player {
@@ -62,7 +74,7 @@ body .modal-lg {
 #slideoptions {
 	width: 100%;
 	background-color: black;
-	margin-top: 50px;
+	margin-top: 45px;
 	padding: 10px 40px 15px 110px;
 }
 
@@ -74,6 +86,8 @@ body .modal-lg {
 	display: inline;
 	margin: 0px 0px 0px 100px;
 	color: #696969;
+	position: relative;
+	z-index: 100;
 }
 
 #slideoptions ul li.active {
