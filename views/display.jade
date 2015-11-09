@@ -1,0 +1,36 @@
+extends layout
+
+block content
+	link(href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/5.2.3/css/bootstrap-slider.min.css" rel="stylesheet")
+	script(src="http://code.highcharts.com/highcharts.js")
+	script(src="http://code.highcharts.com/modules/exporting.js")
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/5.2.3/bootstrap-slider.min.js")
+
+	div(class="panel panel-default")
+		div(class="panel-heading")
+			| Showing data for Ebola: Tags vs. Memes (Demo)
+		div(class="panel-body")
+			div(id="container" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
+		div(class="panel-body")
+			label
+				| Index
+			input(type="text" class="slider" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="-14" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide")
+			br
+			label
+				| Number of elements to show
+			input(type="text" id="numToShow")
+			br
+			label
+				| Transparency
+			input(type="text" id="alpha")
+			br
+			label
+				| Random Value Threshold
+			input(type="text" id="threshold")
+			br
+			label
+				| Number of fake windows
+			input(type="text" id="fake_num")
+
+
+	script(src='js/graph.js')

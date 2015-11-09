@@ -21,31 +21,32 @@ mongo.MongoClient.connect('mongodb://localhost:27017/gridfs', function(err, data
 });
 
 // ues for handling sessions
-passport.serializeUser(function(user, done) {
-  done(null, user._id);
-});
-passport.deserializeUser(function(id, done) {
-  db.collection('users').findOne({_id: ObjectID(id)}, function(err, user) {
-	done(err, user);
-  });
-});
-passport.use('login', new LocalStrategy ({
-	usernameField: 'username',
-	passwordField: 'password'
-},
-function(username, password, done) {
-	User.isValidUserPassword(username, password, db, done);
-}));
+// passport.serializeUser(function(user, done) {
+//   done(null, user._id);
+// });
+// passport.deserializeUser(function(id, done) {
+//   db.collection('users').findOne({_id: ObjectID(id)}, function(err, user) {
+// 	done(err, user);
+//   });
+// });
+// passport.use('login', new LocalStrategy ({
+// 	usernameField: 'username',
+// 	passwordField: 'password'
+// },
+// function(username, password, done) {
+// 	//User.isValidUserPassword(username, password, db, done);
+// }));
 
 // use to make sure logged in
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) { return next(); }
-	res.redirect('/login');
+	///* if (req.isAuthenticated()) {*/  /*}*/
+	return next();
+	//res.redirect('/login');
 }
 
 // use to check if admin or not
 function ensureAdmin(req, res, next) {
-	if (req.user.role == 'Admin') { return next(); };
+	if (true/*req.user.role == 'Admin'*/) { return next(); };
 	res.redirect('/');
 }
 
@@ -59,7 +60,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
 			events.push(data[i].event);
 		}
 	}
-	res.render('index', { title: 'Home', events: events, user_role: req.user.role });
+	res.render('index', { title: 'Home', events: events, user_role: 'Admin' /*'req.user.role'*/ });
   });
 });
 
@@ -89,7 +90,7 @@ router.get('/admin', ensureAuthenticated, ensureAdmin, function(req, res) {
 router.get('/managerels', ensureAuthenticated, ensureAdmin, function(req, res) {
 	db.collection('rels').find().toArray(function(err, data) {
 		res.render('managerels', {
-			title: 'Manage rels', 
+			title: 'Manage rels',
 			data: data.reverse()
 		});
 	});
@@ -125,7 +126,7 @@ router.post('/managerels/edit/:id', ensureAuthenticated, ensureAdmin, function(r
 router.get('/managefiles', ensureAuthenticated, ensureAdmin, function(req, res) {
 	db.collection('fs.files').find({}).toArray(function(err, data) {
 		res.render('managefiles', {
-			title: 'Manage files', 
+			title: 'Manage files',
 			data: data.reverse()
 		});
 	});
@@ -159,7 +160,7 @@ router.post('/managefiles/edit/:id', ensureAuthenticated, ensureAdmin, function(
 router.get('/manageusers', ensureAuthenticated, ensureAdmin, function(req, res) {
 	db.collection('users').find().toArray(function(err, data) {
 		res.render('manageusers', {
-			title: 'Manage users', 
+			title: 'Manage users',
 			data: data.reverse()
 		});
 	});
@@ -169,7 +170,7 @@ router.post('/manageusers/new', ensureAuthenticated, ensureAdmin, function(req, 
 		if(err) throw err;
 		data.username = req.body.username;
 		data.role = req.body.role;
-		db.collection('users').insert(data, function(err, data) { 
+		db.collection('users').insert(data, function(err, data) {
 			res.redirect('/manageusers');
 		});
 	});
@@ -192,7 +193,7 @@ router.get('/timelinedata/:event/:date/:countries', ensureAuthenticated, functio
 		},
 		date: [],
 		era: []
-	}, 
+	},
 	countries = [],
 	dates = [],
 	dateCounts = [],
@@ -347,7 +348,7 @@ router.get('/timeline/:event_name/:date/:countries', ensureAuthenticated, functi
 				}
 			}
 			res.render('timeline', {
-				title: 'Timeline', 
+				title: 'Timeline',
 				event: req.params.event_name,
 				date: req.params.date,
 				countries: req.params.countries,
@@ -356,7 +357,7 @@ router.get('/timeline/:event_name/:date/:countries', ensureAuthenticated, functi
 		});
 	} else {
 		res.render('timeline', {
-			title: 'Timeline', 
+			title: 'Timeline',
 			event: req.params.event_name,
 			date: req.params.date,
 			countries: req.params.countries,
@@ -373,6 +374,13 @@ router.get('/images/:id', ensureAuthenticated, function(req, res) {
 	});
 	readstream = gfs.createReadStream({_id: req.params.id});
 	readstream.pipe(res);
+});
+
+// for serving the coclustering data
+router.get('/display', ensureAuthenticated, function(req, res) {
+	res.render('display', {
+		title: 'Coclustering data',
+	});
 });
 
 // for streaming video

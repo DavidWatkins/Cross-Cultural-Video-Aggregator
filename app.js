@@ -24,13 +24,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(multer());
 
-app.use(session({
-    secret: 'AED019284KZDE', 
-    saveUninitialized: true,
-    resave: true
-}));
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(session({
+//     secret: 'AED019284KZDE',
+//     saveUninitialized: true,
+//     resave: true
+// }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 app.use(flash());
 
 var routes = require('./routes/index');
