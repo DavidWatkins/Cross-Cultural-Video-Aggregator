@@ -40,14 +40,40 @@ $(function () {
 
 	function addNodes(graph, fake_data) {
 
+		var numToCluster = 1;
+		var numToUse = 0.75;
+
+		var allTags = new Array(fake_data[0][0].length);
+		var numVideos = fake_data[0].length;
+		var allVideos = new Array(numVideos);			
+
 		for(var i = 0; i < 1; i++) {
-			for(var y = 0; y < fake_data[i].length; y++) {
-				graph.addNode('video' + parseInt(y));
-				for(var x = 0; x < fake_data[i][y].length; x++) {
-					graph.addNode('tag' + parseInt(x));
-					if(fake_data[i][y][x] == 1) {
-						graph.addLink('video' + parseInt(y), 'tag' + parseInt(x), {id : 'tag' + parseInt(x)});
+			for(var y = 0; y < fake_data[i].length * numToUse; y += numToCluster) {
+				for(var x = 0; x < fake_data[i][y].length * numToUse; x += numToCluster) {
+					if(y == 0)
+						allTags[x] = [];
+
+					loop1: for(var y1 = y; y1 < y + numToCluster && y1 < fake_data[i].length; y1++) {
+						for(var x1 = x; x1 < x + numToCluster && x1 < fake_data[i][y].length; x1++) {
+							if(fake_data[i][y1][x1] == 1) {
+								if(allVideos[y] === undefined){
+									allVideos[y] = true;
+									graph.addNode('video' + parseInt(y));
+								}
+
+								for(var k = 0; k < allTags[x].length; k++)
+									graph.addLink('video' + parseInt(y), allTags[x][k], {id : 0});
+								allTags[x].push('video' + parseInt(y));	
+								break loop1; 
+							}
+						}
 					}
+
+					// if(fake_data[i][y][x] == 1) {
+					// 	for(var k = 0; k < allTags[x].length; k++)
+					// 		graph.addLink('video' + parseInt(y), allTags[x][k], {id : 0});
+					// 	allTags[x].push('video' + parseInt(y));						
+					// }
 				}
 			}
 		}
@@ -132,6 +158,13 @@ $(function () {
 				var graph = initGraph();
 				var graphics = initGraphics(graph);
 				var renderer = initRenderer(graph, graphics);
+
+				$("#pauseButton").click(function() {
+					renderer.pause();
+				});
+				$("#resumeButton").click(function() {
+					renderer.resume();
+				});
 				main(graph, graphics, nodeSize, renderer, fake_data);
 
 			});
