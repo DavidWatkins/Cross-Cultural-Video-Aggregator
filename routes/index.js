@@ -383,6 +383,13 @@ router.get('/display', ensureAuthenticated, function(req, res) {
 	});
 });
 
+// for serving the coclustering data
+router.get('/vivatest', ensureAuthenticated, function(req, res) {
+	res.render('vivatest', {
+		title: 'Vivagraph data',
+	});
+});
+
 // for streaming video
 router.get('/videos/:id', ensureAuthenticated, function(req, res) {
 	db.collection('fs.files').findOne(new ObjectID(req.params.id), function(err, data) {
