@@ -25,6 +25,102 @@ function calculate_data(fake_data, numToCalculate) {
 	}
 }
 
+function generateHistogramX(data) {
+
+	var histogram = [];
+	/* Display data, but also generate fake data that is based on a random noise applied to initial data */
+	for(var y = 0; y < data[0].length; y++) {
+		for(var x = 0; x < data[0][y].length; x++) {
+			if(y == 0) histogram.push(0);
+			if(!isNaN(data[0][y][x])) histogram[x] += parseInt(data[0][y][x]);
+		}
+	} 
+	return histogram;
+}
+
+function generateHistogramY(data) {
+
+	var histogram = [];
+	/* Display data, but also generate fake data that is based on a random noise applied to initial data */
+	for(var y = 0; y < data[0].length; y++) {
+		histogram.push(0);
+		for(var x = 0; x < data[0][y].length; x++) {
+			if(!isNaN(data[0][y][x])) histogram[y] += parseInt(data[0][y][x]);
+		}
+	} 
+	return histogram;
+}
+
+function getDictFrom(histogram) {
+	var dict = {};
+
+	for(var x = 0; x < histogram.length; x++) {
+		dict[x] = histogram[x];
+	}
+
+	return dict;
+}
+
+function getMinValFrom(histogramDict, slice_length) {
+	var items = Object.keys(histogramDict).map(function(key) {
+	    return [key, histogramDict[key]];
+	});
+	items.sort(function(first, second) {
+	    return first[1] - second[1];
+	});
+	var temp = items.slice(0, slice_length);
+	var max = 0;
+	for(var x = 0; x < temp.length; x++) {
+		if(temp[x][1] > max) max = temp[x][1];
+	}
+	return max;
+}
+
+function getMaxValFrom(histogramDict, slice_length) {
+	var items = Object.keys(histogramDict).map(function(key) {
+	    return [key, histogramDict[key]];
+	});
+	items.sort(function(first, second) {
+	    return second[1] - first[1];
+	});
+	var temp = items.slice(0, slice_length);
+	var min = 10000; //TODO FIX THIS
+	for(var x = 0; x < temp.length; x++) {
+		if(temp[x][1] < min) min = temp[x][1];
+	}
+	return min;
+}
+
+function filterData(fake_data, histogramX, histogramY, slice_length) {
+	var maxXVal  = getMaxValFrom(histogramX, slice_length);
+	var minXVal  = getMinValFrom(histogramX, slice_length);
+	var maxYVal  = getMaxValFrom(histogramY, slice_length);
+	var minYVal	 = getMinValFrom(histogramY, slice_length);
+
+	console.log(maxXVal);
+	console.log(minXVal);
+	console.log(maxYVal);
+	console.log(minYVal);
+
+	var newFakeData = [];
+
+	for(var i = 0; i < fake_data.length; i++) {
+		newFakeData.push([]);
+
+		for(var y = 0; y < fake_data[i].length; y++) {
+			newFakeData[i].push([]);
+			for(var x = 0; x < fake_data[i][y].length; x++) {				
+				if(histogramY[y] < maxYVal && histogramY[y] > minYVal &&
+				   histogramX[x] < maxXVal && histogramX[x] > minXVal)
+					newFakeData[i][y].push(fake_data[i][y][x]);
+				else
+					newFakeData[i][y].push(0);
+			}
+		}
+	} 
+	return newFakeData;
+}
+
 function parseData(matData) {
 	var lines = matData.split('\n');
 	var fake_data = [];
@@ -40,6 +136,22 @@ function parseData(matData) {
 	}
 
 	return fake_data;
+}
+
+function showHistogram(histogram, container, name) {
+	console.log(histogram);
+	$(container).highcharts({
+		chart: {
+			type: 'column',
+		},
+		title: {
+			text: name
+		},
+		series: [{
+            name: '',
+            data: histogram
+        }]
+	});
 }
 
 function parseMemeIndex(visual_meme_index) {
@@ -91,7 +203,7 @@ function parsecluster(memeIndex, cluster1) {
 	return meme_index;
 }
 
-function updateChart(fake_data, meme_index, mySlider, alphaValue, numToShowValue) {
+function updateChart(name, fake_data, meme_index, mySlider, alphaValue, numToShowValue) {
 	var value = mySlider.slider( "getValue" );
 
 	var alpha = 0.1;
@@ -132,7 +244,7 @@ function updateChart(fake_data, meme_index, mySlider, alphaValue, numToShowValue
 	var series = [USSeries, EUSeries, mixedSeries, noTypeSeries];
 	console.log(series);
 
-	$('#container').highcharts({
+	$(name).highcharts({
 		chart: {
 			type: 'scatter',
 			zoomType: 'xy'

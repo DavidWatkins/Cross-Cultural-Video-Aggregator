@@ -28,7 +28,16 @@ $(function () {
 				//Slider should dictate how much data is shown
 				//
 
-				updateChart(fake_data, meme_index, mySlider, alphaValue, numToShowValue);
+				var histogramX = generateHistogramX(fake_data);
+				var histogramY = generateHistogramY(fake_data);
+				showHistogram(histogramX, "#histogramX", "Tag Histogram");
+				showHistogram(histogramY, "#histogramY", "Visual Meme Histogram");
+
+				histogramX = getDictFrom(histogramX);
+				histogramY = getDictFrom(histogramY);
+				var newfake_data = filterData(fake_data, histogramX, histogramY, 10);
+				updateChart("#real", fake_data, meme_index, mySlider, alphaValue, numToShowValue);
+				updateChart("#container", newfake_data, meme_index, mySlider, alphaValue, numToShowValue);
 			});
 		});
 	});

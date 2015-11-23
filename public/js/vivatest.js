@@ -38,10 +38,13 @@ $(function () {
 		.attr('orient', "auto");
 	}
 
-	function addNodes(graph, fake_data) {
+	function addNodes(graph, fake_data, histogramX, histogramY) {
 
 		var numToCluster = 1;
-		var numToUse = 0.75;
+		var numToUse = 1;
+
+		var XLength = histogramX.length;
+		var YLength = histogramY.length;
 
 		var allTags = new Array(fake_data[0][0].length);
 		var numVideos = fake_data[0].length;
@@ -62,7 +65,7 @@ $(function () {
 								}
 
 								for(var k = 0; k < allTags[x].length; k++)
-									graph.addLink('video' + parseInt(y), allTags[x][k], {id : 0});
+									graph.addLink('video' + parseInt(y), allTags[x][k], {id : 0, connectionStrength: (histogramX[x]+histogramY[y])/(XLength + YLength)});
 								allTags[x].push('video' + parseInt(y));	
 								break loop1; 
 							}
@@ -79,7 +82,7 @@ $(function () {
 		}
 	}
 
-	function main(graph, graphics, nodeSize, renderer, fake_data) {
+	function main(graph, graphics, nodeSize, renderer, fake_data, histogramX, histogramY) {
 		graphics.node(function(node) {
 			return Viva.Graph.svg('image')
 			.attr('width', nodeSize)
@@ -137,7 +140,7 @@ $(function () {
 		});
 
 		// Finally we add something to the graph:
-		addNodes(graph, fake_data);
+		addNodes(graph, fake_data, histogramX, histogramY);
 		renderer.run();
 	}
 
@@ -152,6 +155,12 @@ $(function () {
 				fake_data = parseData(matData);
 				calculate_data(fake_data, numToCalculate);
 
+				var histogramX = generateHistogramX(fake_data);
+				var histogramY = generateHistogramY(fake_data);
+				histogramX = getDictFrom(histogramX);
+				histogramY = getDictFrom(histogramY);
+				var newfake_data = filterData(fake_data, histogramX, histogramY, 60);
+
 				var memeIndex = parseMemeIndex(visual_meme_index);
 				meme_index = parsecluster(memeIndex, cluster1);
 
@@ -165,7 +174,7 @@ $(function () {
 				$("#resumeButton").click(function() {
 					renderer.resume();
 				});
-				main(graph, graphics, nodeSize, renderer, fake_data);
+				main(graph, graphics, nodeSize, renderer, newfake_data, histogramX, histogramY);
 
 			});
 		});
