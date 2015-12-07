@@ -1,40 +1,75 @@
-extends layout
+doctype html
+html(ng-app='StarterApp')
+	head
+		title= title
+		link(rel='stylesheet', href='/css/display.css')
+		link(rel='stylesheet', href='/css/bootstrap.min.css')
+		script(type="text/javascript", src="/js/jquery-2.1.0.min.js")
+		script(type="text/javascript", src="/js/bootstrap.min.js")
+		script(type="text/javascript", src="http://cdn.knightlab.com/libs/timeline/latest/js/storyjs-embed.js")
 
-block content
-	link(href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/5.2.3/css/bootstrap-slider.min.css" rel="stylesheet")
-	script(src="http://code.highcharts.com/highcharts.js")
-	script(src="http://code.highcharts.com/modules/exporting.js")
-	script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/5.2.3/bootstrap-slider.min.js")
+		link(href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/5.2.3/css/bootstrap-slider.min.css" rel="stylesheet")
+		script(src="http://code.highcharts.com/highcharts.js")
+		script(src="http://code.highcharts.com/modules/exporting.js")
+		script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/5.2.3/bootstrap-slider.min.js")
 
-	div(class="panel panel-default")
-		div(class="panel-heading")
-			| Showing data for Ebola: Tags vs. Memes (Demo)
-		div(class="panel-body")
-			div(id="histogramX" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
-			div(id="histogramY" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
-			div(id="real" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
-			div(id="container" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
-		div(class="panel-body")
-			label
-				| Index
-			input(type="text" class="slider" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="-14" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide")
-			br
-			label
-				| Number of elements to show
-			input(type="text" id="numToShow")
-			br
-			label
-				| Transparency
-			input(type="text" id="alpha")
-			br
-			label
-				| Random Value Threshold
-			input(type="text" id="threshold")
-			br
-			label
-				| Number of fake windows
-			input(type="text" id="fake_num")
+		// Angular Material Dependencies
+		link(rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css")
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-aria.min.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.js')
+		script(src='//cdn.jsdelivr.net/angular-material-icons/0.4.0/angular-material-icons.min.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-route.js')
 
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.min.js')
+	body(layout='row', ng-controller='AppCtrl')
+		md-sidenav.md-sidenav-left.md-whiteframe-z2(layout='column', md-component-id='left', md-is-locked-open="$mdMedia('gt-md')")
+			md-toolbar.md-tall.md-hue-2
+				span(flex)
+				div.md-toolbar-tools-bottom.inset(layout="column")
+					h3 Dashboard
+			md-list
+				md-item
+					a(ng-href="/")
+						md-item-content(md-ink-ripple='', layout='row', layout-align='start center')
+							.inset
+								ng-md-icon(icon='arrow_back')
+							.inset
+								| Back
+				md-item(ng-repeat='item in views')
+					a(ng-href="{{item.id}}")
+						md-item-content(md-ink-ripple='', layout='row', layout-align='start center')
+							.inset
+								| {{item.title}}
+		.relative(layout='column', layout-fill='', role='main')
+			md-toolbar(ng-show='!showSearch')
+				.md-toolbar-tools
+					md-button(ng-click="toggleSidenav('left')", hide-gt-md='', aria-label='Menu')
+						ng-md-icon(icon='menu')
+					span(flex='')
+					md-button(aria-label='Search', ng-click='showSearch = !showSearch')
+						ng-md-icon(icon='search')
+					md-button(aria-label='Open Settings', ng-click='showListBottomSheet($event)')
+						ng-md-icon(icon='more_vert')
+			md-toolbar.md-hue-1(ng-show='showSearch')
+				.md-toolbar-tools
+					md-button(ng-click='showSearch = !showSearch', aria-label='Back')
+						ng-md-icon(icon='arrow_back')
+					h3(flex='10')
+						| Back
+					md-input-container(md-theme='input', flex='')
+						label  
+						input(ng-model='search.who', placeholder='enter search')
+					md-button(aria-label='Search', ng-click='showSearch = !showSearch')
+						ng-md-icon(icon='search')
+					md-button(aria-label='Open Settings', ng-click='showListBottomSheet($event)')
+						ng-md-icon(icon='more_vert')
+			md-content(flex='', md-scroll-y='')
+				div.view-animate(ng-view)
 
-	script(src='js/graph_helpers.js')
-	script(src='js/graph.js')
+		script(src='js/appController.js')
+		script(src='js/graphCleanerService.js')
+		script(src='js/highchartController.js')
+		script(src='js/vivagraphController.js')
+		script(src='js/histogramController.js')

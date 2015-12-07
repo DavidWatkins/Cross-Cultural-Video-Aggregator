@@ -1,0 +1,21 @@
+div(ng-controller="histogramController")
+
+	md-toolbar.md-primary
+		h2.md-flex Showing Histogram data
+
+	md-content.autoScroll(layout-padding='')
+	md-input-container.md-icon-float.md-block
+		// Use floating label instead of placeholder
+		label Number of fake matrices
+		input(ng-model='numToCalculate', type='number')
+	md-input-container.md-icon-float.md-block
+		// Use floating label instead of placeholder
+		label Threshold for removing nodes
+		input(ng-model='threshold', type='number')
+
+	md-content#mynetworkcontainer(flex layout-padding)
+		div(id="histogramX" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
+		div(id="histogramY" style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")
+
+	script(src='js/graph_helpers.js')
+	script(src='js/graph.js')

@@ -383,6 +383,18 @@ router.get('/display', ensureAuthenticated, function(req, res) {
 	});
 });
 
+router.get('/cocluster/vivagraph', ensureAuthenticated, function(req, res) {
+	res.render('v_vivagraph');
+});
+
+router.get('/cocluster/highchart', ensureAuthenticated, function(req, res) {
+	res.render('v_highchart');
+});
+
+router.get('/cocluster/histogram', ensureAuthenticated, function(req, res) {
+	res.render('v_histogram');
+});
+
 // for serving the coclustering data
 router.get('/vivatest', ensureAuthenticated, function(req, res) {
 	res.render('vivatest', {

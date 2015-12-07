@@ -204,12 +204,14 @@ function parsecluster(memeIndex, cluster1) {
 }
 
 function updateChart(name, fake_data, meme_index, mySlider, alphaValue, numToShowValue) {
-	var value = mySlider.slider( "getValue" );
+	//var value = mySlider.slider( "getValue" );
 
 	var alpha = 0.1;
-	if(alphaValue.val() != null && alphaValue.val() != 0 && !isNaN(alphaValue.val())) {
-		alpha = alphaValue.val();
-	}
+	//if(alphaValue.val() != null && alphaValue.val() != 0 && !isNaN(alphaValue.val())) {
+	//	alpha = alphaValue.val();
+	//}
+
+	var value = 1;
 
 	numToShow = 50;
 
@@ -219,9 +221,9 @@ function updateChart(name, fake_data, meme_index, mySlider, alphaValue, numToSho
 	var noTypeSeries = {name:'No Type Videos', color: GRAY_COLOR + (alpha).toString() + ')', data: []};
 
 	var numToShow = 1;
-	if(numToShowValue.val() != null && numToShowValue.val() != 0) {
-		numToShow = numToShowValue.val();
-	}
+	//if(numToShowValue.val() != null && numToShowValue.val() != 0) {
+	//	numToShow = numToShowValue.val();
+	//}
 
 
 	for(var i = value; i < value + 1; i++) {

@@ -1,0 +1,43 @@
+div(ng-controller="highchartController" ng-init="init()")
+
+	md-toolbar.md-primary
+	h2.md-flex Showing highcharts data
+
+	md-content.autoScroll(layout-padding='')
+		md-input-container.md-icon-float.md-block
+			| Alpha value for coloring dots
+			md-slider(ng-model='alpha', step='0.1', min='0', max='1' aria-label='')
+		md-input-container.md-icon-float.md-block
+			| Dice Threshold
+			md-slider(ng-model='diceThreshold', step='0.05', min='0', max='1' aria-label='')
+		md-input-container.md-icon-float.md-block
+			label Threshold for filtering data
+			input(ng-model='threshold', type='number')
+		md-input-container.md-icon-float.md-block
+			label Number of random matrices to show
+			input(ng-model='numToShow', type='number')
+		md-input-container.md-icon-float.md-block
+			| Threshold for assigning a random value
+			md-slider(ng-model='randomThreshold', min='0', max='0.1' aria-label='')
+		md-input-container.md-icon-float.md-block
+			| Radius for dots on graph
+			md-slider(ng-model='radius', step='1', min='1', max='5' aria-label='')
+		md-input-container.md-icon-float.md-block
+			| Generate fake data
+			md-select(ng-model="generateData")
+				md-option(ng-value="true") Yes
+				md-option(ng-value="false") No
+		md-input-container.md-icon-float.md-block
+			| Block Diagonalize
+			md-select(ng-model="blockDiagonalize")
+				md-option(ng-value="true") Yes
+				md-option(ng-value="false") No
+		md-input-container.md-icon-float.md-block
+			| Select Filter Type
+			md-select(ng-model="filterType")
+				md-option(ng-value="filter.id" ng-repeat="filter in filters") {{ filter.name }}
+		md-input-container.md-icon-float.md-block
+			md-button(ng-click="initGraph()") Reload
+
+	md-content#mynetworkcontainer(flex layout-padding)
+		div#container(style="min-width: 310px; height: 800px; max-width: 1200px; margin: 0 auto")

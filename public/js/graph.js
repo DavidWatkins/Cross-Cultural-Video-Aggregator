@@ -5,9 +5,6 @@ $(function () {
 			jQuery.get('data/Cluster1.txt', function(cluster1) {
 
 				//Value of slider on the screen
-				var mySlider = $("input.slider").slider();
-				var alphaValue = $("#alpha");
-				var numToShowValue = $("#numToShow");
 
 				//Array of 2D arrays holding data
 				var fake_data = [];
@@ -18,13 +15,10 @@ $(function () {
 
 				var memeIndex = parseMemeIndex(visual_meme_index);
 				meme_index = parsecluster(memeIndex, cluster1);
-
-				mySlider.on('slideStop', function(ev){
-					updateChart(fake_data, meme_index);
-				});
+				var mySlider, alphaValue, numToShowValue;
 
 				//On change from slider, update the chart
-				//Generate lots of fake data
+				//Generate lots of fake datas
 				//Slider should dictate how much data is shown
 				//
 
