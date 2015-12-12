@@ -1,16 +1,11 @@
 app.factory("parseService", function() {
 	var US_VIDEO = 0, EU_VIDEO = 1, MIXED_VIDEO = 2;
 	var service = {};
-  //Likelihood of data changing
+  	//Likelihood of data changing
 
 	service.US_VIDEO = 0;
 	service.EU_VIDEO = 1;
 	service.MIXED_VIDEO = 2;
-
-	service.US_COLOR = 'rgba(255, 0, 0,'; 
-	service.EU_COLOR = 'rgba(0,0,255,'; 
-	service.MIXED_COLOR = 'rgba(75,0,130,'; 
-	service.GRAY_COLOR = 'rgba(128, 128, 128,';
 
 	service.calculate_data = function(incoming_data, numToCalculate, threshold) {
 
@@ -288,7 +283,35 @@ app.factory("parseService", function() {
 		return newFakeData;
 	}
 
-	service.cuthillMckee = function(data) {
+	service.rcm = function(data, orderX, orderY) {
+
+		Array.prototype.argSort = function() {
+			var indexes = new Array(this.length);
+			var self = this;
+	        for (var i = 0; i < indexes.length; i++) {
+	            indexes[i] = i;
+	        }
+
+	        indexes = indexes.sort(function(x, y) {
+	        	if(self[x] > self[y]) {
+	        		return 1;
+	        	} else if (self[x] < self[y]) {
+	        		return -1;
+	        	} else {
+	        		return 0;
+	        	}
+	        });
+
+	        return indexes;
+		};
+
+		Array.prototype.max = function() {
+		  return Math.max.apply(null, this);
+		};
+
+		Array.prototype.min = function() {
+		  return Math.min.apply(null, this);
+		};
 
 		//http://codereview.stackexchange.com/questions/19088/implementing-the-cuthill-mckee-algorithm
 		function zero(array) {
@@ -314,16 +337,172 @@ app.factory("parseService", function() {
 			return degree;
 		}
 
-		function reverse_cuthill_mckee(ind, ptr, num_rows) {
+		function transpose(arr) {
+			var nArr = new Array(arr.length);
+		  for (var i = 0; i < arr.length; i++) {
+		  	nArr[i] = new Array(arr[i].length);
+		    for (var j = 0; j < arr[i].length; j++) {
+		      //swap element[i,j] and element[j,i]
+		      nArr[i][j] = arr[j][i];
+		    }
+		  }
+
+		  return nArr;
+		}
+
+		function multiply(a, b) {
+		  var aNumRows = a.length, aNumCols = a[0].length,
+		      bNumRows = b.length, bNumCols = b[0].length,
+		      m = new Array(aNumRows);  // initialize array of rows
+
+		  for (var r = 0; r < aNumRows; ++r) {
+		    m[r] = new Array(bNumCols); // initialize the current row
+		    for (var c = 0; c < bNumCols; ++c) {
+		      m[r][c] = 0;             // initialize the current cell
+		      for (var i = 0; i < aNumCols; ++i) {
+		        m[r][c] += a[r][i] * b[i][c];
+		      }
+		    }
+		  }
+		  return m;
+		}
+
+		function returnYOrdered(order, mat) {
+			var newMat = new Array(mat.length);
+			for(var i = 0; i < mat.length; i++) {
+				newMat[i] = mat[order[i]];
+			}
+			return newMat;
+		}
+
+		function returnXOrdered(order, mat) {
+			var newMat = new Array(mat.length);
+			for(var y = 0; y < mat.length; y++) {
+				newMat[y] = new Array(mat[y].length);
+				for(var x = 0; x < mat[y].length; x++) {
+					newMat[y][x] = mat[y][order[x]];
+				}
+			}
+			return newMat;
+		}
+
+		function display(m) {
+		  for (var r = 0; r < m.length; ++r) {
+		    document.write('&nbsp;&nbsp;'+m[r].join(' ')+'<br />');
+		  }
+		}
+
+		function convertToCSR(mat) {
+			var indices = [];
+			var indptr = [0];
+			var index = 0;
+			for(var y = 0; y < mat.length; y++) {
+				for(var x = 0; x < mat[y].length; x++) {
+					if(mat[y][x] == 1) {
+						indices.push(x);
+						index++;
+					}
+				}
+				indptr.push(index);
+			}
+
+			return {indices: indices, indptr: indptr};
+		}
+
+		// function CSRtoMat(ind, ptr) {
+		// 	for(var i = 0; i < )
+		// }
+
+		function rcm(ind, ptr, num_rows) {
 			var N = 0, N_old, seed, level_start, level_end;
 			var zz, i, j, ii, jj, kk, ll, level_len, temp, temp2;
 
 			var order = new Array(num_rows);
 			zero(order);
 			var degree = node_degrees(ind, ptr, num_rows);
-			var inds
+			var inds = degree.argSort();
+			var rev_inds = inds.argSort();
+			var temp_degrees = new Array(degree.max());
+			zero(temp_degrees);
+
+			for(zz = 0; zz < num_rows; zz++) {
+				if(inds[zz] != -1) { //Do BFS with seed=inds[zz]
+					seed = inds[zz];
+					order[N] = seed;
+					N += 1;
+					inds[rev_inds[seed]] = -1;
+					level_start = N - 1;
+					level_end = N;
+
+					while(level_start < level_end) {
+						for(ii = level_start; ii < level_end; ii++) {
+		                    i = order[ii];
+		                    N_old = N;
+
+		                    // add unvisited neighbors
+		                    for(jj=ptr[i]; jj < ptr[i+1]; jj++) {
+		                        // j is node number connected to i
+		                        j = ind[jj];
+		                        if(inds[rev_inds[j]] != -1) {
+		                            inds[rev_inds[j]] = -1;
+		                            order[N] = j;
+		                            N += 1;
+		                        }
+		                    }
+
+		                    // Add values to temp_degrees array for insertion sort
+		                    level_len = 0;
+		                    for(kk = N_old; kk < N; kk++) {
+		                        temp_degrees[level_len] = degree[order[kk]];
+		                        level_len += 1;
+		                    }
+
+		                    // Do insertion sort for nodes from lowest to highest degree
+		                    for(kk = 1; kk < level_len; kk++) {
+		                        temp = temp_degrees[kk];
+		                        temp2 = order[N_old+kk];
+		                        ll = kk;
+		                        while((ll > 0) && (temp < temp_degrees[ll-1])) {
+		                            temp_degrees[ll] = temp_degrees[ll-1];
+		                            order[N_old+ll] = order[N_old+ll-1];
+		                            ll -= 1;
+		                        }
+		                        temp_degrees[ll] = temp;
+		                        order[N_old+ll] = temp2;
+		                    }
+		                }
+
+		                // set next level start and end ranges
+		                level_start = level_end;
+		                level_end = N;
+					}
+				}
+				if(N == num_rows)
+					break;
+			}
+
+    		// return reversed order for RCM ordering
+		    return order.reverse();
 		}
 
+		var mat = data[0];
+		//display(mat);
+		var transpose_mat = transpose(mat);
+		//display(transpose_mat);
+		var AAT = multiply(mat, transpose_mat);
+		var ATA = multiply(transpose_mat, mat);
+		//display(AAT);
+		var csrAAT = convertToCSR(AAT);
+		var csrATA = convertToCSR(ATA);
+		var orderAAT = rcm(csrAAT.indices, csrAAT.indptr, AAT.length);
+		var orderATA = rcm(csrATA.indices, csrATA.indptr, ATA.length);
+
+		if(orderY)
+		 	mat = returnYOrdered(orderAAT, mat);
+		if(orderX)
+			mat = returnXOrdered(orderATA, mat);
+
+		data[0] = mat;
 		return data;
 	}
 

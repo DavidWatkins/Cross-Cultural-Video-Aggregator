@@ -1,5 +1,5 @@
 app.controller('highchartController', 
-	function highchartController($scope, $q, loadData, parseService) {
+	function highchartController($scope, $q, loadService, parseService) {
 		$scope.alpha = 0.1;
 		$scope.count = 1;
 		$scope.numToShow = 1;
@@ -22,15 +22,29 @@ app.controller('highchartController',
 			{ id: $scope.diceFilter, name: 'Dice Filter' }
 		];
 
-		$scope.dataFilteredWithHistogram = [];
-		$scope.meme_index = [];
+		$scope.orderType = 1;
+		$scope.noOrder = 1;
+		$scope.XOrder = 2;
+		$scope.YOrder = 3;
+		$scope.bothOrder = 4;
+		$scope.orders = [
+			{ id: $scope.noOrder, name: 'No RCM' },
+			{ id: $scope.XOrder, name: 'Tag RCM' },
+			{ id: $scope.YOrder, name: 'Visual RCM' },
+			{ id: $scope.bothOrder, name: 'Both RCM' }
+		];
+
+		$scope.US_COLOR = 'rgba(255, 0, 0,'; 
+		$scope.EU_COLOR = 'rgba(0,0,255,'; 
+		$scope.MIXED_COLOR = 'rgba(75,0,130,'; 
+		$scope.GRAY_COLOR = 'rgba(128, 128, 128,';
 
 		$scope.updateChart = function(name, fake_data, meme_index) {
 
-			var EUSeries = {name:'EU Videos', color: parseService.EU_COLOR + ($scope.alpha).toString() + ')', data: []};
-			var USSeries = {name:'US Videos', color: parseService.US_COLOR + ($scope.alpha).toString() + ')', data: []};
-			var mixedSeries = {name:'Both Type Videos', color: parseService.MIXED_COLOR + ($scope.alpha).toString() + ')', data: []};
-			var noTypeSeries = {name:'No Type Videos', color: parseService.GRAY_COLOR + ($scope.alpha).toString() + ')', data: []};
+			var EUSeries = {name:'EU Videos', color: $scope.EU_COLOR + ($scope.alpha).toString() + ')', data: []};
+			var USSeries = {name:'US Videos', color: $scope.US_COLOR + ($scope.alpha).toString() + ')', data: []};
+			var mixedSeries = {name:'Both Type Videos', color: $scope.MIXED_COLOR + ($scope.alpha).toString() + ')', data: []};
+			var noTypeSeries = {name:'No Type Videos', color: $scope.GRAY_COLOR + ($scope.alpha).toString() + ')', data: []};
 
 			for(var i = 0; i < $scope.numToCalculate; i++) {
 				for(var y = 0; y < fake_data[i].length; y++) {
@@ -68,12 +82,14 @@ app.controller('highchartController',
 					},
 					startOnTick: true,
 					endOnTick: true,
-					showLastLabel: true
+					showLastLabel: true,
+					tickInterval: 1
 				},
 				yAxis: {
 					title: {
 						text: 'Tags?'
-					}
+					},
+					tickInterval: 1
 				},
 				legend: {
 					layout: 'vertical',
@@ -113,39 +129,17 @@ app.controller('highchartController',
 			});
 		}
 
-		function getDataFromService(next) {
-			    var q1 = $q.defer(),
-				    q2 = $q.defer(),
-				    q3 = $q.defer(),
-				    p1 = q1.promise, 
-				    p2 = q2.promise,	
-				    p3 = q3.promise;
-
-			loadData.getMatrix($scope, "matrix", q1);
-			loadData.getVisualMemeIndex($scope, "visual_meme_index", q2);
-			loadData.getCluster1($scope, "cluster1", q3);
-
-			var promises = [
-				p1, p2, p3
-			];
-
-			$q.all(promises).then(next);
-		}
-
-		function generateHistograms() {
-			var histogramX = parseService.generateHistogramX($scope.incomingData);
-			var histogramY = parseService.generateHistogramY($scope.incomingData);
-
-			$scope.histogramX = parseService.getDictFrom(histogramX);
-			$scope.histogramY = parseService.getDictFrom(histogramY);
-		}
-
 		$scope.initGraph = function() {
 			$scope.incomingData =  parseService.parseData($scope.matrix);
 			if($scope.generateData)
 				$scope.incomingData = parseService.calculate_data($scope.incomingData, $scope.numToCalculate, $scope.randomThreshold);
 
-			generateHistograms();
+			//Generate histograms
+			var histogramX = parseService.generateHistogramX($scope.incomingData);
+			var histogramY = parseService.generateHistogramY($scope.incomingData);
+
+			$scope.histogramX = parseService.getDictFrom(histogramX);
+			$scope.histogramY = parseService.getDictFrom(histogramY);
 
 			//Apply filters
 			if($scope.filterType == $scope.histogramFilter)
@@ -153,9 +147,20 @@ app.controller('highchartController',
 			else if($scope.filterType == $scope.diceFilter)
 				$scope.incomingData = parseService.diceFilter($scope.incomingData, $scope.diceThreshold);
 
+			//Block Diagonalize
+			if($scope.orderType == $scope.XOrder) {
+				$scope.incomingData = parseService.rcm($scope.incomingData, true, false);
+			}
+			else if($scope.orderType == $scope.YOrder) {
+				$scope.incomingData = parseService.rcm($scope.incomingData, false, true);
+			}
+			else if($scope.orderType == $scope.bothOrder) {
+				$scope.incomingData = parseService.rcm($scope.incomingData, true, true);
+			}
+
 			//Apply Block Diagonalization
 			if($scope.blockDiagonalize)
-				$scope.incomingData = parseService.blockDiagonalize($scope.incomingData);
+				$scope.incomingData = parseService.rcm($scope.incomingData);
 
 			$scope.memeIndex = parseService.parseMemeIndex($scope.visual_meme_index);
 			$scope.meme_index = parseService.parsecluster($scope.memeIndex, $scope.cluster1);
@@ -168,7 +173,9 @@ app.controller('highchartController',
 		}
 
 		$scope.init = function() {
-			getDataFromService($scope.initGraph);
+			loadService
+				.getAllData($scope, "matrix", "visual_meme_index", "cluster1")
+				.then($scope.initGraph);
 		}
 	}
 ); 

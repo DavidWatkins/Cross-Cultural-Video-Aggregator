@@ -28,14 +28,13 @@ div(ng-controller="highchartController" ng-init="init()")
 				md-option(ng-value="true") Yes
 				md-option(ng-value="false") No
 		md-input-container.md-icon-float.md-block
-			| Block Diagonalize
-			md-select(ng-model="blockDiagonalize")
-				md-option(ng-value="true") Yes
-				md-option(ng-value="false") No
-		md-input-container.md-icon-float.md-block
 			| Select Filter Type
 			md-select(ng-model="filterType")
 				md-option(ng-value="filter.id" ng-repeat="filter in filters") {{ filter.name }}
+		md-input-container.md-icon-float.md-block
+			| Select Diagonal Type
+			md-select(ng-model="orderType")
+				md-option(ng-value="order.id" ng-repeat="order in orders") {{ order.name }}
 		md-input-container.md-icon-float.md-block
 			md-button(ng-click="initGraph()") Reload
 

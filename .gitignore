@@ -2,3 +2,4 @@ dump/*
 node_modules/*
 public/data/*
 .idea/*
+public/Video_Data/*

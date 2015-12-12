@@ -71,27 +71,3 @@ app.config(function($mdThemingProvider) {
   $mdThemingProvider.theme('input', 'default')
         .primaryPalette('grey')
 });
-
-app.factory('loadData', ['$http', function($http) {
-
-  var matrixURL = 'data/A.txt';
-  var visual_meme_indexURL = 'data/visual_meme_index';
-  var cluster1URL = 'data/Cluster1.txt';
-  
-   var service = {};
-   service.getMatrix = function($scope, id, q) {
-      $http.get(matrixURL).then(function(response) {$scope[id] = response.data; q.resolve();});
-   }
-
-   service.getVisualMemeIndex = function($scope, id, q) {
-  $http.get(visual_meme_indexURL)
-    .then(function(response) {$scope[id] = response.data; q.resolve();});
-   }
-
-   service.getCluster1 = function($scope, id, q) {
-  $http.get(cluster1URL)
-    .then(function(response) {$scope[id] = response.data; q.resolve();});
-   }
-
-   return service;
- }]);
